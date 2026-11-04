@@ -1,0 +1,18 @@
+# Local game files and generated output
+/inputs/*.iso
+/generated/
+/build/
+/dist/
+/out/
+
+# Logs and binaries
+*.log
+*.dmp
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
+
+# Python
+__pycache__/
