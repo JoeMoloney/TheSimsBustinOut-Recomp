@@ -1,4 +1,6 @@
 # Local game files and generated output
+/references/
+/work/
 /inputs/*.iso
 /generated/
 /build/
@@ -16,3 +18,4 @@
 
 # Python
 __pycache__/
+/ps2_log.txt
