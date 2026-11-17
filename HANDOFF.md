@@ -4,6 +4,12 @@ Last updated: 2026-11-17
 
 ## Latest state — November 17 (late): CREATE-A-SIM REACHED ✅ → next: 3D rendering correctness
 
+- **PERMANENT BUILD (use this; `/tmp/opencode` is no longer needed):** `config/probe/CMakeLists.txt` → `build/probe/` (git-ignored), generated code at `-O2` (`-DSIMS_GENERATED_OPT=...` to change). From the repo root:
+  - configure once: `cmake -S config/probe -B build/probe -DCMAKE_BUILD_TYPE=Release`
+  - build: `cmake --build build/probe --target sims_boot_probe -j 12`
+  - run: `build/probe/sims_boot_probe work/sims-bustin-out/disc-files/SLES_520.48 <secs> [--visible]`
+  - **Saves:** `runtime-data/mc0` and `mc1` in the repo (git-ignored; a copy of the save with the `ABCDEFG` family). The old `work/sims-bustin-out/compile-build` still writes to the accidental nested `work/sims-bustin-out/work/sims-bustin-out/runtime-data`.
+- **House load crash fixed + static scan:** `missing-target 0x340ba0` (a switch split by the recovery pass) → merged into `switch_00340b80` in `config/supplemental-map.csv`. The user then loaded into the game. `tools/find_missing_targets.py` found 3 more such targets (`0x303e98`, `0x2a93c4`, `0x18fa58`), now fixed; 0 remain. Supplemental regeneration from the repo root: `work/sims-bustin-out/recomp-build/ps2xRecomp/ps2_recomp config/supplemental.toml && python3 tools/prepare_supplemental.py work/sims-bustin-out/supplemental-output`.
 - **Bindings are now tracked:** `config/native-bindings.csv` is the source of truth (54 bindings: pad, mc, mpeg, …). Regenerate with `python3 tools/prepare_native_bindings.py config/native-bindings.csv work/sims-bustin-out/native-bindings.cpp`, then rebuild. The `work/` copy is a leftover.
 - **Pad (PS2Recomp `ps2_pad.cpp`):** presses are latched between guest polls (`ps2PadSampleHostInput()` runs after `EndDrawing()` in the host loop), so taps register. **SDL2 GameController input** (CMake option `PS2X_ENABLE_SDL_PAD`, PRIVATE to `ps2_runtime`) makes the user's new Valve Steam Controller work (`[pad] using SDL controller 'Steam Controller'`). It falls back to the raylib gamepad; the keyboard always works. Mapping: A=✕, B=◯, X=□, Y=△, LB/RB=L1/R1, triggers=L2/R2, Start/Back=START/SELECT. The user played past Create-A-Sim with it.
 - **Tests (Nov 17, after the COP0 and IsEnd fixes):** `ps2x_tests` 453/453 and all 4 IOP suites pass.

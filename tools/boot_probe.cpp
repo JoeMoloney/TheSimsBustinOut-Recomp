@@ -153,7 +153,12 @@ int main(int argc, char **argv) {
 
     // Keep probe saves separate from the extracted, user-owned disc files.
     auto paths = PS2Runtime::getIoPaths();
+#ifdef SIMS_RUNTIME_DATA_DIR
+    // Permanent build (config/probe): saves live in <repo>/runtime-data/{mc0,mc1}.
+    paths.mcRoot = std::filesystem::path(SIMS_RUNTIME_DATA_DIR) / "mc0";
+#else
     paths.mcRoot = std::filesystem::absolute("work/sims-bustin-out/runtime-data/mc0");
+#endif
     PS2Runtime::setIoPaths(paths);
     std::cout << "[probe] disc root: " << paths.cdRoot << '\n';
     std::mutex mutex;

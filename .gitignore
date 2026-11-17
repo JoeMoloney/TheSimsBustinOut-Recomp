@@ -19,3 +19,6 @@
 # Python
 __pycache__/
 /ps2_log.txt
+
+# Memory-card saves and other runtime data (local only for now)
+/runtime-data/

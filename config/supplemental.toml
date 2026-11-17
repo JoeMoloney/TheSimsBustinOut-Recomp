@@ -1,0 +1,17 @@
+# PS2Recomp config for the supplemental functions (recovered callbacks, fixed splits).
+# Run from the repo root:
+#   work/sims-bustin-out/recomp-build/ps2xRecomp/ps2_recomp config/supplemental.toml
+#   python3 tools/prepare_supplemental.py work/sims-bustin-out/supplemental-output
+# The ELF entry row is required by the recompiler; prepare_supplemental.py drops it.
+[general]
+input = "work/sims-bustin-out/disc-files/SLES_520.48"
+ghidra_output = "config/supplemental-map.csv"
+output = "work/sims-bustin-out/supplemental-output"
+single_file_output = false
+low_memory_mode = true
+output_worker_threads = 8
+patch_syscalls = false
+patch_cop0 = true
+patch_cache = true
+stubs = []
+skip = []
