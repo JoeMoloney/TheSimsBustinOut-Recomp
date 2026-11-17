@@ -4,6 +4,8 @@
 
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <mutex>
@@ -15,6 +17,82 @@
 #ifdef SIMS_SUPPLEMENTAL_FUNCTIONS
 void registerSupplementalFunctions(PS2Runtime &runtime);
 #endif
+
+// SIMS_FUNC_TRACE=0xADDR[,0xADDR...] (max 32): wrap guest functions in the dispatch table,
+// log a0-a3/ra (plus any argument that points at a printable C string), then call the
+// original. Logs the first 300 calls per function (SIMS_FUNC_TRACE_MAX=<n> to change),
+// then every 1000th.
+namespace func_trace {
+constexpr int kSlots = 32;
+uint32_t g_addr[kSlots]{};
+PS2Runtime::RecompiledFunction g_orig[kSlots]{};
+uint64_t g_calls[kSlots]{};
+
+std::string guestString(uint8_t *rdram, uint32_t ptr) {
+    const uint32_t phys = ptr & 0x1FFFFFFFu;
+    if (phys < 0x100000u || phys >= PS2_RAM_SIZE) return {};
+    std::string s;
+    for (uint32_t i = 0; i < 64 && phys + i < PS2_RAM_SIZE; ++i) {
+        const char c = static_cast<char>(rdram[phys + i]);
+        if (c == '\0') return s.size() >= 3 ? s : std::string{};
+        if (c < 0x20 || c > 0x7e) return {};
+        s.push_back(c);
+    }
+    return {};
+}
+
+template <int Slot>
+void wrapper(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime) {
+    const uint64_t n = ++g_calls[Slot];
+    static const uint64_t maxLogged = [] {
+        const char *v = std::getenv("SIMS_FUNC_TRACE_MAX");
+        return v && *v ? std::strtoull(v, nullptr, 10) : 300ull;
+    }();
+    const bool logged = n <= maxLogged || n % 1000 == 0;
+    if (logged) {
+        std::cout << "[func-trace] 0x" << std::hex << g_addr[Slot] << " #" << std::dec << n << std::hex;
+        for (int r = 4; r <= 7; ++r) {
+            const uint32_t v = getRegU32(ctx, r);
+            std::cout << " a" << (r - 4) << "=0x" << v;
+            if (const std::string s = guestString(rdram, v); !s.empty()) std::cout << "(\"" << s << "\")";
+        }
+        std::cout << " ra=0x" << getRegU32(ctx, 31) << std::dec << '\n';
+    }
+    g_orig[Slot](rdram, ctx, runtime);
+    if (logged)
+        std::cout << "[func-trace]   -> 0x" << std::hex << g_addr[Slot] << " v0=0x" << getRegU32(ctx, 2)
+                  << std::dec << '\n';
+}
+
+template <int... Slots>
+constexpr std::array<PS2Runtime::RecompiledFunction, kSlots> makeWrappers(std::integer_sequence<int, Slots...>) {
+    return {&wrapper<Slots>...};
+}
+
+void install(PS2Runtime &runtime) {
+    const char *spec = std::getenv("SIMS_FUNC_TRACE");
+    if (!spec || !*spec) return;
+    static constexpr auto wrappers = makeWrappers(std::make_integer_sequence<int, kSlots>{});
+    std::string list(spec);
+    int slot = 0;
+    for (size_t pos = 0; pos < list.size() && slot < kSlots;) {
+        const size_t comma = list.find(',', pos);
+        const std::string item = list.substr(pos, comma == std::string::npos ? std::string::npos : comma - pos);
+        pos = comma == std::string::npos ? list.size() : comma + 1;
+        const uint32_t addr = static_cast<uint32_t>(std::stoul(item, nullptr, 16));
+        auto original = runtime.lookupFunction(addr);
+        if (!original) {
+            std::cerr << "[func-trace] no function registered at 0x" << std::hex << addr << std::dec << '\n';
+            continue;
+        }
+        g_addr[slot] = addr;
+        g_orig[slot] = original;
+        runtime.registerFunction(addr, wrappers[slot]);
+        std::cout << "[func-trace] tracing 0x" << std::hex << addr << std::dec << '\n';
+        ++slot;
+    }
+}
+} // namespace func_trace
 #ifdef SIMS_NATIVE_BINDINGS
 void registerNativeBindings(PS2Runtime &runtime);
 #endif
@@ -52,6 +130,25 @@ int main(int argc, char **argv) {
 #endif
     if (!visible) SetConfigFlags(FLAG_WINDOW_HIDDEN);
     if (!runtime.initialize("The Sims Bustin' Out — native boot probe")) return 3;
+    if (visible) {
+        // List monitors; SIMS_WINDOW_MONITOR=<n> moves the window onto monitor n and keeps
+        // it on top (handy when a fullscreen app covers the primary display).
+        for (int m = 0; m < GetMonitorCount(); ++m) {
+            const Vector2 pos = GetMonitorPosition(m);
+            std::cout << "[probe] monitor " << m << " '" << GetMonitorName(m) << "' "
+                      << GetMonitorWidth(m) << 'x' << GetMonitorHeight(m) << " at (" << pos.x
+                      << ',' << pos.y << ")\n";
+        }
+        if (const char *mon = std::getenv("SIMS_WINDOW_MONITOR"); mon && *mon) {
+            const int m = std::atoi(mon);
+            if (m >= 0 && m < GetMonitorCount()) {
+                const Vector2 pos = GetMonitorPosition(m);
+                SetWindowPosition(static_cast<int>(pos.x) + 50, static_cast<int>(pos.y) + 50);
+                SetWindowState(FLAG_WINDOW_TOPMOST);
+                std::cout << "[probe] window moved to monitor " << m << '\n';
+            }
+        }
+    }
     if (!runtime.loadELF(argv[1])) return 4;
 
     // Keep probe saves separate from the extracted, user-owned disc files.
@@ -69,6 +166,7 @@ int main(int argc, char **argv) {
             runtime.requestStop();
         }
     });
+    func_trace::install(runtime);
     runtime.run();
     {
         std::lock_guard lock(mutex);
@@ -88,6 +186,17 @@ int main(int argc, char **argv) {
               {"DMAC_STAT", 0x1000e010}, {"INTC_STAT", 0x1000f000}}})
         std::cout << "[probe:HW] " << name << "=0x" << std::hex << runtime.memory().read32(address)
                   << std::dec << '\n';
+    // Opt-in: SIMS_EE_RAM_DUMP=<file> writes the 32 MiB of EE RAM at exit for offline
+    // inspection (guest address N = file offset N).
+    if (const char *dumpPath = std::getenv("SIMS_EE_RAM_DUMP"); dumpPath && *dumpPath) {
+        if (FILE *out = std::fopen(dumpPath, "wb")) {
+            std::fwrite(runtime.memory().getRDRAM(), 1, PS2_RAM_SIZE, out);
+            std::fclose(out);
+            std::cout << "[probe] EE RAM dumped to " << dumpPath << '\n';
+        } else {
+            std::cerr << "[probe] could not open " << dumpPath << '\n';
+        }
+    }
     const auto iop = runtime.iopDebugSnapshot();
     std::cout << "[probe] IOP modules=" << iop.emulatorLoadedModules
               << " threads=" << iop.emulatorThreads << " RPC servers=" << iop.emulatorRpcServers
