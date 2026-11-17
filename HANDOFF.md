@@ -2,7 +2,15 @@
 
 Last updated: 2026-11-17
 
-## Latest state — November 17: LANGUAGE MENU + AUTOSAVE NOTICE WORK ✅ → next blocker: IPU
+## Latest state — November 17 (late): CREATE-A-SIM REACHED ✅ → next: 3D rendering correctness
+
+- **Movies fixed:** the "IPU" pink screen was the game's FMV player (`FUN_002a1620`–`0x2a1f90`) inside Sony libmpeg/libipu. 9 libmpeg functions are bound to PS2Recomp's FFmpeg-backed `sceMpeg*` HLE in `native-bindings.csv` (backup `native-bindings.before-mpeg.csv`): Init `0x3776b8`, Create `0x377768`, AddStrCallback `0x376e50`, AddCallback `0x377aa0`, DemuxPssRing `0x376b58`, GetPicture `0x377988`, IsEnd `0x3779e0`, Reset `0x3779f0`, Delete `0x377978`.
+- **PS2Recomp `MPEG.cpp` `sceMpegIsEnd` fix:** it required the `sceCdSt` CD-stream EOF flag, which this game never raises (it streams through the EoR driver), so movies never ended. When no `sceCdSt` stream was ever started (`cdStreamGeneration == 0`), the PSS program end now counts as the end.
+- **User visible run (keyboard):** EA logo → Maxis logo → intro movie (START skips) → main menu → START → "Bust Out"/"Credits" → **Create-A-Sim**. The UI is correct, but the 3D scene is wrong (flat yellow sky, untextured brown/black geometry, camera inside geometry). Memory #598, #599.
+- **User notes:** the Create-A-Sim 3D is garbled; front-end UI is rough or misaligned in places (overlapping language labels); navigation is very slow and keys must be held, because the game runs ~5–8× slower than real time and the HLE pad samples raylib key state only at the game's poll, so taps between polls are lost.
+- **Next (suggested order):** (1) latch key presses between pad polls (quick win for testing); (2) performance (generated code is `-O1`; profile; keep tracing off for play runs); (3) 3D correctness (VU1 microprograms, texture/CLUT uploads, `RLETEXTU.ARC`); (4) Apt UI alignment. Get PCSX2 screenshots of the same screen to compare. The controller is still untested with PCSX2 closed. With `SIMS_WINDOW_MONITOR` (always on top) keyboard focus can fail under XWayland, so run without it.
+
+## Earlier on November 17: LANGUAGE MENU + AUTOSAVE NOTICE WORK ✅ → blocker was the IPU (now solved, see above)
 
 Memory-service entries #586–#597 hold the details (addresses, struct offsets, evidence).
 
