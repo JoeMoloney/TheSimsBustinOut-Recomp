@@ -4,6 +4,10 @@ Last updated: 2026-11-17
 
 ## Latest state — November 17 (late): CREATE-A-SIM REACHED ✅ → next: 3D rendering correctness
 
+- **Bindings are now tracked:** `config/native-bindings.csv` is the source of truth (54 bindings: pad, mc, mpeg, …). Regenerate with `python3 tools/prepare_native_bindings.py config/native-bindings.csv work/sims-bustin-out/native-bindings.cpp`, then rebuild. The `work/` copy is a leftover.
+- **Pad (PS2Recomp `ps2_pad.cpp`):** presses are latched between guest polls (`ps2PadSampleHostInput()` runs after `EndDrawing()` in the host loop), so taps register. **SDL2 GameController input** (CMake option `PS2X_ENABLE_SDL_PAD`, PRIVATE to `ps2_runtime`) makes the user's new Valve Steam Controller work (`[pad] using SDL controller 'Steam Controller'`). It falls back to the raylib gamepad; the keyboard always works. Mapping: A=✕, B=◯, X=□, Y=△, LB/RB=L1/R1, triggers=L2/R2, Start/Back=START/SELECT. The user played past Create-A-Sim with it.
+- **Tests (Nov 17, after the COP0 and IsEnd fixes):** `ps2x_tests` 453/453 and all 4 IOP suites pass.
+
 - **Movies fixed:** the "IPU" pink screen was the game's FMV player (`FUN_002a1620`–`0x2a1f90`) inside Sony libmpeg/libipu. 9 libmpeg functions are bound to PS2Recomp's FFmpeg-backed `sceMpeg*` HLE in `native-bindings.csv` (backup `native-bindings.before-mpeg.csv`): Init `0x3776b8`, Create `0x377768`, AddStrCallback `0x376e50`, AddCallback `0x377aa0`, DemuxPssRing `0x376b58`, GetPicture `0x377988`, IsEnd `0x3779e0`, Reset `0x3779f0`, Delete `0x377978`.
 - **PS2Recomp `MPEG.cpp` `sceMpegIsEnd` fix:** it required the `sceCdSt` CD-stream EOF flag, which this game never raises (it streams through the EoR driver), so movies never ended. When no `sceCdSt` stream was ever started (`cdStreamGeneration == 0`), the PSS program end now counts as the end.
 - **User visible run (keyboard):** EA logo → Maxis logo → intro movie (START skips) → main menu → START → "Bust Out"/"Credits" → **Create-A-Sim**. The UI is correct, but the 3D scene is wrong (flat yellow sky, untextured brown/black geometry, camera inside geometry). Memory #598, #599.
