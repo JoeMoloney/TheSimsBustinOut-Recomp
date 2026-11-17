@@ -5,6 +5,7 @@ Last updated: 2026-11-17
 ## Latest state — November 17 (late): CREATE-A-SIM REACHED ✅ → next: 3D rendering correctness
 
 - **End of session (Nov 17):** the permanent `-O2` build runs into the game with no `missing-target` stops and finds the save in `runtime-data/`. **Performance is ~1–3 fps (~5% of real time) at both `-O1` and `-O2`, so the bottleneck is the runtime, not the generated code.** **First task next session: profile with `perf`** (software GS renderer, scheduler, IOP interpreter and hot-path locks/logging are the suspects). Build note: compile `register_functions.cpp` at `-O0` (~10 of the 19.6 build minutes at `-O2`).
+- **Ship of Theseus (after the perf work):** feasible by porting Fable II's `tools/theseus` (`/mnt/HDD/git_stuff/my_git/Fable-2-Recomp/tools/theseus`, see its README): an R5900 diff-test harness (200k random states, EE ABI, flat 32 MiB RDRAM, stub runtime), inventory for PS2Recomp's per-function output, caller check on MIPS disassembly, ship via `registerFunction` overrides. Naming evidence: ~900 assert source paths (no symbols, no RTTI). Pilot: ~10 leaf functions from `bstring.cpp` / `IFFResFile2.cpp`. Memory #605.
 
 - **PERMANENT BUILD (use this; `/tmp/opencode` is no longer needed):** `config/probe/CMakeLists.txt` → `build/probe/` (git-ignored), generated code at `-O2` (`-DSIMS_GENERATED_OPT=...` to change). From the repo root:
   - configure once: `cmake -S config/probe -B build/probe -DCMAKE_BUILD_TYPE=Release`
