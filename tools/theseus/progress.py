@@ -132,7 +132,7 @@ def defrag_map(funcs, states, labels):
     o = [f'<rect class="bg" width="{W}" height="{H}" rx="8"/>',
          text(28, 38, "Ship of Theseus · SLES_520.48 code, in address order", "t1", 20, 600),
          text(28, 60, f"One square per recompiled function ({n:,}). Red is machine-generated code; "
-                      f"green has been rewritten by hand and proven equivalent.", "t3", 12)]
+                      f"green has been rewritten and proven equivalent.", "t3", 12)]
     x = 28
     for s in (SHIPPED, VERIFIED, PROGRESS, ORIGINAL):  # legend with counts
         label = f"{STAGE_NAMES[s]}  {count[s]:,}"
