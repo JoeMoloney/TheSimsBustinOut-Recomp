@@ -1,0 +1,4 @@
+a0 ptr
+mem32 @a0+0 ptr   # the word array
+a1 len 300        # first bit
+a2 len 40         # number of bits (32 and over hit the mask-wraps-to-0 cases)

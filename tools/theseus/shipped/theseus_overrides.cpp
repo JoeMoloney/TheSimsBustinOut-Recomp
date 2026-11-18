@@ -9,41 +9,109 @@
 
 namespace rw0
 {
-#include "rewrites/RegisteredObject_Construct_002cb4d8.cpp"
+#include "rewrites/BitArray_Read_002ac6b8.cpp"
 }
 namespace rw1
 {
-#include "rewrites/bstring2_AddRef_002c9148.cpp"
+#include "rewrites/Field584_PositiveElse5BC_0015c9b8.cpp"
 }
 namespace rw2
 {
-#include "rewrites/bstring2_InitEmpty_002c9dd8.cpp"
+#include "rewrites/Flags38_SetBit28_00187390.cpp"
 }
 namespace rw3
 {
-#include "rewrites/bstring_AddRef_002c85c8.cpp"
+#include "rewrites/Flags_HasAll_00345150.cpp"
 }
 namespace rw4
 {
-#include "rewrites/bstring_Data_002c8538.cpp"
+#include "rewrites/GlobalTable_EntryFieldC_00258248.cpp"
 }
 namespace rw5
 {
-#include "rewrites/bstring_InitEmpty_002c8a68.cpp"
+#include "rewrites/Mem_Copy_00268588.cpp"
 }
 namespace rw6
 {
-#include "rewrites/bstring_NarrowFromWide16_002c8418.cpp"
+#include "rewrites/Mode_TryEnter_002157c0.cpp"
 }
 namespace rw7
 {
-#include "rewrites/bstring_RefCount_002c9078.cpp"
+#include "rewrites/RegisteredObject_Construct_002cb4d8.cpp"
 }
 namespace rw8
 {
-#include "rewrites/bstring_Wide16FromWide32_002c8f68.cpp"
+#include "rewrites/SByte3_Copy_002cbf58.cpp"
 }
 namespace rw9
+{
+#include "rewrites/SByte3_Copy_002cc050.cpp"
+}
+namespace rw10
+{
+#include "rewrites/SByte3_FromFixed4_002cbf78.cpp"
+}
+namespace rw11
+{
+#include "rewrites/SByte3_SetClamped_002cbfa8.cpp"
+}
+namespace rw12
+{
+#include "rewrites/SmallAlloc_FreeToBin_00101d08.cpp"
+}
+namespace rw13
+{
+#include "rewrites/Stack_PeekFromTop_00234c20.cpp"
+}
+namespace rw14
+{
+#include "rewrites/TwoSlot_Value_00258268.cpp"
+}
+namespace rw15
+{
+#include "rewrites/TypeTag_IsFlaggedType11_00232da8.cpp"
+}
+namespace rw16
+{
+#include "rewrites/TypeTag_IsFlaggedType23_00232df8.cpp"
+}
+namespace rw17
+{
+#include "rewrites/TypeTag_IsFlaggedType24_00232dd0.cpp"
+}
+namespace rw18
+{
+#include "rewrites/bstring2_AddRef_002c9148.cpp"
+}
+namespace rw19
+{
+#include "rewrites/bstring2_InitEmpty_002c9dd8.cpp"
+}
+namespace rw20
+{
+#include "rewrites/bstring_AddRef_002c85c8.cpp"
+}
+namespace rw21
+{
+#include "rewrites/bstring_Data_002c8538.cpp"
+}
+namespace rw22
+{
+#include "rewrites/bstring_InitEmpty_002c8a68.cpp"
+}
+namespace rw23
+{
+#include "rewrites/bstring_NarrowFromWide16_002c8418.cpp"
+}
+namespace rw24
+{
+#include "rewrites/bstring_RefCount_002c9078.cpp"
+}
+namespace rw25
+{
+#include "rewrites/bstring_Wide16FromWide32_002c8f68.cpp"
+}
+namespace rw26
 {
 #include "rewrites/bstring_WideFromNarrow_002c8fa0.cpp"
 }
@@ -57,70 +125,172 @@ namespace
         PS2Runtime::RecompiledFunction fn;
     };
 
-    std::atomic<uint64_t> g_calls[10];
+    std::atomic<uint64_t> g_calls[27];
 
     void call_0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[0].fetch_add(1, std::memory_order_relaxed);
-        rw0::RegisteredObject_Construct_002cb4d8(rdram, ctx, runtime);
+        rw0::BitArray_Read_002ac6b8(rdram, ctx, runtime);
     }
     void call_1(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[1].fetch_add(1, std::memory_order_relaxed);
-        rw1::bstring2_AddRef_002c9148(rdram, ctx, runtime);
+        rw1::Field584_PositiveElse5BC_0015c9b8(rdram, ctx, runtime);
     }
     void call_2(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[2].fetch_add(1, std::memory_order_relaxed);
-        rw2::bstring2_InitEmpty_002c9dd8(rdram, ctx, runtime);
+        rw2::Flags38_SetBit28_00187390(rdram, ctx, runtime);
     }
     void call_3(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[3].fetch_add(1, std::memory_order_relaxed);
-        rw3::bstring_AddRef_002c85c8(rdram, ctx, runtime);
+        rw3::Flags_HasAll_00345150(rdram, ctx, runtime);
     }
     void call_4(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[4].fetch_add(1, std::memory_order_relaxed);
-        rw4::bstring_Data_002c8538(rdram, ctx, runtime);
+        rw4::GlobalTable_EntryFieldC_00258248(rdram, ctx, runtime);
     }
     void call_5(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[5].fetch_add(1, std::memory_order_relaxed);
-        rw5::bstring_InitEmpty_002c8a68(rdram, ctx, runtime);
+        rw5::Mem_Copy_00268588(rdram, ctx, runtime);
     }
     void call_6(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[6].fetch_add(1, std::memory_order_relaxed);
-        rw6::bstring_NarrowFromWide16_002c8418(rdram, ctx, runtime);
+        rw6::Mode_TryEnter_002157c0(rdram, ctx, runtime);
     }
     void call_7(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[7].fetch_add(1, std::memory_order_relaxed);
-        rw7::bstring_RefCount_002c9078(rdram, ctx, runtime);
+        rw7::RegisteredObject_Construct_002cb4d8(rdram, ctx, runtime);
     }
     void call_8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[8].fetch_add(1, std::memory_order_relaxed);
-        rw8::bstring_Wide16FromWide32_002c8f68(rdram, ctx, runtime);
+        rw8::SByte3_Copy_002cbf58(rdram, ctx, runtime);
     }
     void call_9(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
         g_calls[9].fetch_add(1, std::memory_order_relaxed);
-        rw9::bstring_WideFromNarrow_002c8fa0(rdram, ctx, runtime);
+        rw9::SByte3_Copy_002cc050(rdram, ctx, runtime);
+    }
+    void call_10(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[10].fetch_add(1, std::memory_order_relaxed);
+        rw10::SByte3_FromFixed4_002cbf78(rdram, ctx, runtime);
+    }
+    void call_11(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[11].fetch_add(1, std::memory_order_relaxed);
+        rw11::SByte3_SetClamped_002cbfa8(rdram, ctx, runtime);
+    }
+    void call_12(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[12].fetch_add(1, std::memory_order_relaxed);
+        rw12::SmallAlloc_FreeToBin_00101d08(rdram, ctx, runtime);
+    }
+    void call_13(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[13].fetch_add(1, std::memory_order_relaxed);
+        rw13::Stack_PeekFromTop_00234c20(rdram, ctx, runtime);
+    }
+    void call_14(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[14].fetch_add(1, std::memory_order_relaxed);
+        rw14::TwoSlot_Value_00258268(rdram, ctx, runtime);
+    }
+    void call_15(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[15].fetch_add(1, std::memory_order_relaxed);
+        rw15::TypeTag_IsFlaggedType11_00232da8(rdram, ctx, runtime);
+    }
+    void call_16(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[16].fetch_add(1, std::memory_order_relaxed);
+        rw16::TypeTag_IsFlaggedType23_00232df8(rdram, ctx, runtime);
+    }
+    void call_17(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[17].fetch_add(1, std::memory_order_relaxed);
+        rw17::TypeTag_IsFlaggedType24_00232dd0(rdram, ctx, runtime);
+    }
+    void call_18(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[18].fetch_add(1, std::memory_order_relaxed);
+        rw18::bstring2_AddRef_002c9148(rdram, ctx, runtime);
+    }
+    void call_19(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[19].fetch_add(1, std::memory_order_relaxed);
+        rw19::bstring2_InitEmpty_002c9dd8(rdram, ctx, runtime);
+    }
+    void call_20(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[20].fetch_add(1, std::memory_order_relaxed);
+        rw20::bstring_AddRef_002c85c8(rdram, ctx, runtime);
+    }
+    void call_21(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[21].fetch_add(1, std::memory_order_relaxed);
+        rw21::bstring_Data_002c8538(rdram, ctx, runtime);
+    }
+    void call_22(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[22].fetch_add(1, std::memory_order_relaxed);
+        rw22::bstring_InitEmpty_002c8a68(rdram, ctx, runtime);
+    }
+    void call_23(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[23].fetch_add(1, std::memory_order_relaxed);
+        rw23::bstring_NarrowFromWide16_002c8418(rdram, ctx, runtime);
+    }
+    void call_24(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[24].fetch_add(1, std::memory_order_relaxed);
+        rw24::bstring_RefCount_002c9078(rdram, ctx, runtime);
+    }
+    void call_25(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[25].fetch_add(1, std::memory_order_relaxed);
+        rw25::bstring_Wide16FromWide32_002c8f68(rdram, ctx, runtime);
+    }
+    void call_26(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+    {
+        g_calls[26].fetch_add(1, std::memory_order_relaxed);
+        rw26::bstring_WideFromNarrow_002c8fa0(rdram, ctx, runtime);
     }
 
     const Override kOverrides[] = {
-        {"RegisteredObject_Construct_002cb4d8", 0x2cb4d8u, call_0},
-        {"bstring2_AddRef_002c9148", 0x2c9148u, call_1},
-        {"bstring2_InitEmpty_002c9dd8", 0x2c9dd8u, call_2},
-        {"bstring_AddRef_002c85c8", 0x2c85c8u, call_3},
-        {"bstring_Data_002c8538", 0x2c8538u, call_4},
-        {"bstring_InitEmpty_002c8a68", 0x2c8a68u, call_5},
-        {"bstring_NarrowFromWide16_002c8418", 0x2c8418u, call_6},
-        {"bstring_RefCount_002c9078", 0x2c9078u, call_7},
-        {"bstring_Wide16FromWide32_002c8f68", 0x2c8f68u, call_8},
-        {"bstring_WideFromNarrow_002c8fa0", 0x2c8fa0u, call_9},
+        {"BitArray_Read_002ac6b8", 0x2ac6b8u, call_0},
+        {"Field584_PositiveElse5BC_0015c9b8", 0x15c9b8u, call_1},
+        {"Flags38_SetBit28_00187390", 0x187390u, call_2},
+        {"Flags_HasAll_00345150", 0x345150u, call_3},
+        {"GlobalTable_EntryFieldC_00258248", 0x258248u, call_4},
+        {"Mem_Copy_00268588", 0x268588u, call_5},
+        {"Mode_TryEnter_002157c0", 0x2157c0u, call_6},
+        {"RegisteredObject_Construct_002cb4d8", 0x2cb4d8u, call_7},
+        {"SByte3_Copy_002cbf58", 0x2cbf58u, call_8},
+        {"SByte3_Copy_002cc050", 0x2cc050u, call_9},
+        {"SByte3_FromFixed4_002cbf78", 0x2cbf78u, call_10},
+        {"SByte3_SetClamped_002cbfa8", 0x2cbfa8u, call_11},
+        {"SmallAlloc_FreeToBin_00101d08", 0x101d08u, call_12},
+        {"Stack_PeekFromTop_00234c20", 0x234c20u, call_13},
+        {"TwoSlot_Value_00258268", 0x258268u, call_14},
+        {"TypeTag_IsFlaggedType11_00232da8", 0x232da8u, call_15},
+        {"TypeTag_IsFlaggedType23_00232df8", 0x232df8u, call_16},
+        {"TypeTag_IsFlaggedType24_00232dd0", 0x232dd0u, call_17},
+        {"bstring2_AddRef_002c9148", 0x2c9148u, call_18},
+        {"bstring2_InitEmpty_002c9dd8", 0x2c9dd8u, call_19},
+        {"bstring_AddRef_002c85c8", 0x2c85c8u, call_20},
+        {"bstring_Data_002c8538", 0x2c8538u, call_21},
+        {"bstring_InitEmpty_002c8a68", 0x2c8a68u, call_22},
+        {"bstring_NarrowFromWide16_002c8418", 0x2c8418u, call_23},
+        {"bstring_RefCount_002c9078", 0x2c9078u, call_24},
+        {"bstring_Wide16FromWide32_002c8f68", 0x2c8f68u, call_25},
+        {"bstring_WideFromNarrow_002c8fa0", 0x2c8fa0u, call_26},
     };
 }
 

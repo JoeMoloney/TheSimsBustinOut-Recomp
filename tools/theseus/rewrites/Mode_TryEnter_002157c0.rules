@@ -1,0 +1,4 @@
+a0 len 30
+mem32 0x3f92b8 oneof 0 0 0 7 0x10000   # mostly free, so the entry path runs
+mem32 0x3f92b4 u32                     # ruled so they are compared after every case
+mem32 0x3f92bc u32

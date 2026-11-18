@@ -12,7 +12,14 @@ For every `jal <function>` in the game ELF, the caller's code after the call is 
 becomes dead. A register is READ if an instruction uses it first. At a call or tail jump the
 next function may read only its arguments (a0..a7); at `jr $ra` the caller's own caller may
 read only v0/v1. Anything the decoder can't follow (`jr` through a register other than $ra,
-an unknown instruction, a long path) counts as a read, so a PASS is conservative.
+an unknown instruction, a long path) counts as a read.
+
+ABI rule (where the code can't be followed: indirect calls `jalr`, syscalls, switch jumps
+`jr <reg>`): a scratch register the caller has not written since our call is dead there. GCC
+treats every scratch register as clobbered by a call, so compiled code cannot read one or pass
+it on without writing it first. Survey (2026-11-18) of all 42,912 calls inside known functions,
+16 scratch registers each (~687,000 checks): 11 reads, all after calls that never return (the
+function map runs on into the next function) or in Sony SDK assembly.
 
 The function's address appearing as data or built with lui+addiu means it may also be called
 through a pointer (callers unknown); that is reported as a warning.
@@ -137,7 +144,7 @@ def decode(pc):
 
 FUNCS = elfscan.load_functions()
 STARTS = [a for a, _ in FUNCS]
-MAX_DEPTH = 4
+MAX_DEPTH = 8
 _memo = {}
 
 
@@ -188,10 +195,7 @@ def _walk(pc, reg, depth, in_callee):
                 pc += 4
                 continue
             if kind == "syscall":
-                if reg in {3, 4, 5, 6, 7}:  # v1 = syscall number, a0..a3
-                    return "read", pc
-                pc += 4
-                continue
+                break  # ABI rule: an argument the caller didn't write since our call is not passed
             if kind == "stop":
                 break
             # Control transfer: the delay slot runs first (for likely branches only when taken).
@@ -222,9 +226,7 @@ def _walk(pc, reg, depth, in_callee):
                 pc = target
                 continue
             if kind in ("call", "jump"):
-                if reg in ARGS:  # the next function may take it as an argument: look inside
-                    if target is None:
-                        return "unknown", pc  # jalr: callee not known
+                if reg in ARGS and target is not None:  # direct call: look inside the callee
                     v, at = walk(target, reg, depth + 1, True)
                     if v != "dead":
                         return v, at
@@ -242,8 +244,10 @@ def _walk(pc, reg, depth, in_callee):
                         if v != "dead":
                             return v, at
                 break
-            return "unknown", pc  # jr through a register: a switch table we don't follow
+            # jr through a register (a switch): not followed. Dead by the ABI rule below.
+            break
     return "dead", None
+
 
 
 def usage_after(pc, reg):

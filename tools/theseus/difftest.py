@@ -38,7 +38,7 @@ REG_NAMES.update({"v0": 2, "v1": 3, "gp": 28, "sp": 29, "fp": 30, "ra": 31})
 REG_NAMES.update({f"s{i}": 16 + i for i in range(8)})
 KINDS = {"any": "kAny", "ptr": "kPtr", "ptr_or_null": "kPtrOrNull", "int": "kInt", "u32": "kU32",
          "len": "kLen", "slen": "kSLen", "fixed": "kFixed", "oneof": "kOneOf",
-         "str": "kStr8", "wstr16": "kStr16", "wstr32": "kStr32"}
+         "str": "kStr8", "wstr16": "kStr16", "wstr32": "kStr32", "aptr": "kAPtr", "alen": "kALen"}
 
 
 def die(msg):
@@ -64,7 +64,7 @@ def kind_and_value(words, where):
         if not 1 <= len(rest) <= 8:
             die(f"{where}: oneof takes 1..8 values")
         return KINDS[kind], 0, [int(v, 0) for v in rest]
-    needs_value = kind in ("len", "slen", "fixed", "str", "wstr16", "wstr32")
+    needs_value = kind in ("len", "slen", "fixed", "str", "wstr16", "wstr32", "alen")
     if needs_value != bool(rest):
         die(f"{where}: {kind} {'needs a value' if needs_value else 'takes no value'}")
     return KINDS[kind], int(rest[0], 0) if rest else 0, []

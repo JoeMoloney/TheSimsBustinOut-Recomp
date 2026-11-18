@@ -1,0 +1,2 @@
+a0 ptr       # the block
+a1 len 512   # its size (0 wraps to a far-away "bin", as in the original)

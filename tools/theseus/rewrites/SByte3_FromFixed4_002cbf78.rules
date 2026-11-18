@@ -1,0 +1,4 @@
+a0 ptr
+a1 ptr
+mem32 @a1+0 int
+mem32 @a1+4 int

@@ -25,6 +25,8 @@
 //   a0 ptr | ptr_or_null | int | u32 | any | len N | slen N | fixed V | oneof V1 .. V8
 //                                    (int/u32: a quarter of the time an edge value such as
 //                                    0xFFFF, 0x10000, 0x7FFFFFFF or 0xFFFFFFFF)
+//   a0 aptr | alen N                 pointer / length aligned to 8 half the time, to 4 a quarter
+//                                    (reaches word-at-a-time paths, e.g. memcpy)
 //   a1 str N | wstr16 N | wstr32 N   pointer to a NUL-terminated string of 8/16/32-bit
 //                                    characters, length 0..N (a quarter at N-1..N+1)
 //   mem32 0x456500 ptr               a 32-bit global, set before each case
@@ -49,7 +51,8 @@ void theseus_rewrite(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime);
 namespace
 {
     constexpr uint32_t kRam = PS2_RAM_SIZE;
-    constexpr uint32_t kWindow = 0x01000000, kWindowSize = 0x10000;
+    using theseus_stub::kWindow;
+    using theseus_stub::kWindowSize;
     constexpr uint32_t kStackTop = 0x01F00000, kStackSize = 0x8000, kSpOffset = 0x1000;
     constexpr uint32_t kDefaultGp = 0x003FFAF0;  // the game's $gp (seen in every probe run)
     constexpr long kScanEvery = 1000;
@@ -61,7 +64,7 @@ namespace
         uint32_t below(uint32_t n) { return uint32_t(next() % n); }
     };
 
-    enum Kind { kAny, kPtr, kPtrOrNull, kInt, kU32, kLen, kSLen, kFixed, kOneOf, kStr8, kStr16, kStr32 };
+    enum Kind { kAny, kPtr, kPtrOrNull, kInt, kU32, kLen, kSLen, kFixed, kOneOf, kStr8, kStr16, kStr32, kAPtr, kALen };
     struct ArgRule { int reg; Kind kind; uint32_t max; uint32_t alts[8]; uint32_t n_alts; };
     struct MemRule { uint32_t addr; Kind kind; uint32_t max; int base; uint32_t deref; uint32_t alts[8]; uint32_t n_alts; };
     struct DataRule { uint32_t addr; const char *hex; };
@@ -97,6 +100,16 @@ namespace
         case kSLen: return sext32(uint32_t(int32_t(r.below(2 * max + 1)) - int32_t(max)));
         case kFixed: return sext32(max);
         case kOneOf: return sext32(alts[r.below(n_alts)]);
+        case kAPtr:  // aligned to 8 half the time, to 4 a quarter, otherwise any
+        {
+            const uint32_t p = window_ptr(r), pick = r.below(4);
+            return sext32(pick < 2 ? p & ~7u : pick == 2 ? (p & ~7u) | 4u : p);
+        }
+        case kALen:  // 0..max, a multiple of 8 half the time and of 4 a quarter
+        {
+            const uint32_t v = r.below(max + 1), pick = r.below(4);
+            return pick < 2 ? v & ~7u : pick == 2 ? v & ~3u : v;
+        }
         default: return r.next();
         }
     }
@@ -378,7 +391,7 @@ int main(int argc, char **argv)
     std::printf("abi_mismatches=%ld strict_mismatches=%ld\n", abi_bad, strict_bad);
     std::printf("v0_low32_mismatches=%ld v0_high32_mismatches=%ld memory_mismatches=%ld"
                 " frame_mismatches=%ld (below sp, strict only)\n", v0_bad, v0_high_bad, mem_bad, frame_bad);
-    std::printf("runtime_event_mismatches=%ld (original: returns=%ld calls/jumps out=%ld hardware accesses=%ld)\n",
+    std::printf("runtime_event_mismatches=%ld (original: returns=%ld calls out=%ld hardware accesses=%ld)\n",
                 event_bad, total_returns, total_transfers, total_special);
     std::printf("differing_fields:");
     for (size_t i = 0; i < fields.size(); ++i)

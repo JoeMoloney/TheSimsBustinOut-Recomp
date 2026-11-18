@@ -10,7 +10,8 @@ Per rewrite (tools/theseus/rewrites/<rewrite>.cpp):
   3. Rewrite mutants: small changes to the rewrite (an integer literal +1, a comparison flipped,
      a read/write width changed, a store dropped). Each must FAIL a 20,000-case diff test,
      which shows the random inputs reach every line. A survivor fails the gate; if the change
-     really is equivalent, mark that line `// gate: equivalent <reason>`.
+     really is equivalent, mark the line `// gate: equivalent <token>: <reason>` (skips only the
+     mutants whose replacement contains <token>, e.g. read16).
 Then a row in tools/theseus/batch/ledger.tsv (same columns as Fable II's ledger): status
 `gated` or `gate-fail` (rows already `reviewed`, `shipped` or `rejected` keep their status).
 Writes out/theseus/gate/<rewrite>/gate.json.
@@ -39,7 +40,9 @@ SWAPS = [(r"!=", "=="), (r"==", "!="), (r"<=", "<"), (r"(?<![<-])<(?![<=])", "<=
          (r">=", ">"), (r"(?<![>-])>(?![>=])", ">="),
          (r"\bread8\(", "read16("), (r"\bread16\(", "read8("), (r"\bread16\(", "read32("),
          (r"\bread32\(", "read16("), (r"\bwrite8\(", "write16("), (r"\bwrite16\(", "write8("),
-         (r"\bwrite16\(", "write32("), (r"\bwrite32\(", "write16(")]
+         (r"\bwrite16\(", "write32("), (r"\bwrite32\(", "write16("),
+         (r"\bread64\(", "read32("), (r"\bwrite64\(", "write32("), (r">>", "<<"), (r"<<", ">>"),
+         (r"\bsread8\(", "read8("), (r"\bsread16\(", "read16(")]
 
 
 def run(cmd, env=None):
@@ -55,8 +58,6 @@ def code_lines(src):
         stripped = line.strip()
         if not stripped or stripped.startswith(("//", "#", "namespace", "{", "}", "void ")):
             continue
-        if "gate: equivalent" in line:
-            continue
         out.append(i)
     return out
 
@@ -67,8 +68,10 @@ def mutants(path):
     for i in code_lines(src):
         line = src[i]
         code, _, comment = line.partition("//")
+        # `static_cast<T>(...)`: its angle brackets are not comparisons (masked for matching).
+        masked = re.sub(r"\w+_cast<[^<>]*>", lambda m: "_" * len(m.group(0)), code)
         for pat, rep in SWAPS:
-            for m in re.finditer(pat, code):
+            for m in re.finditer(pat, masked):
                 new = code[:m.start()] + rep + code[m.end():]
                 result.append((i + 1, f"{m.group(0)} -> {rep}", new + ("//" + comment if comment else "")))
         for m in re.finditer(r"\b(0x[0-9A-Fa-f]+|\d+)u?\b", code):
@@ -78,8 +81,16 @@ def mutants(path):
             result.append((i + 1, f"{m.group(1)} -> {lit}", new + ("//" + comment if comment else "")))
         if re.search(r"\bg\.write(8|16|32)\(", code):
             result.append((i + 1, "drop store", "// (dropped) " + line.strip()))
-    texts = []
+    # `// gate: equivalent <token>: <reason>` skips the mutants on that line whose replacement
+    # contains <token> (e.g. read16); a bare `// gate: equivalent` skips the whole line.
+    kept = []
     for lineno, what, new in result:
+        marker = re.search(r"gate: equivalent(?: (\S+?):?(?:\s|$))?", src[lineno - 1])
+        if marker and (marker.group(1) is None or marker.group(1) in what.split("->")[-1]):
+            continue
+        kept.append((lineno, what, new))
+    texts = []
+    for lineno, what, new in kept:
         copy = list(src)
         copy[lineno - 1] = new
         texts.append((lineno, what, "\n".join(copy)))

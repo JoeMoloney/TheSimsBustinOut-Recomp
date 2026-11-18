@@ -1,0 +1,3 @@
+a0 aptr      # dst
+a1 aptr      # src (may overlap dst)
+a2 alen 600  # n
