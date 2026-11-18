@@ -30,24 +30,19 @@ file's functions together, so the first such function is where the label points.
 
 Standard library only. Each SVG carries its own light and dark colours.
 """
-import bisect
 import csv
 import datetime
 import math
 import os
 import re
-import struct
 from html import escape
 
-REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-ELF = os.path.join(REPO, "work/sims-bustin-out/disc-files/SLES_520.48")
-MAPS = [os.path.join(REPO, "work/sims-bustin-out/SLES_520.48-recovered-map.csv"),
-        os.path.join(REPO, "config/supplemental-map.csv")]
+import elfscan
+
+REPO = elfscan.REPO
 LEDGER = os.path.join(REPO, "tools/theseus/batch/ledger.tsv")
 OUT_DIR = os.path.join(REPO, "docs/progress")
 
-# Single LOAD segment of SLES_520.48 (readelf -lW): file offset, virtual address, file size.
-SEG_OFF, SEG_VA, SEG_SIZE = 0x1000, 0x100000, 0x2F88A8
 # Known Sony SDK entry points, labelled on the map (addresses from config/native-bindings.csv).
 SDK_LABELS = (("Sony libmpeg (HLE)", 0x3776B8), ("Sony libkernel", 0x396B50))
 SIZE_CAP = 65536  # the last map entry runs into data; cap any single function's bytes
@@ -69,41 +64,12 @@ INK_DARK = {"bg": "#1a1a19", "t1": "#f0efec", "t2": "#c3c2b7", "t3": "#898781"}
 # ---------------------------------------------------------------- data
 
 
-def load_functions():
-    funcs = {}
-    for path in MAPS:
-        with open(path) as f:
-            for row in csv.DictReader(f):
-                funcs.setdefault(int(row["start"], 16), int(row["size"]))
-    return [(a, funcs[a]) for a in sorted(funcs)]
-
-
 def source_file_labels(funcs):
-    """Return {source file: index of the first function that references it}."""
-    with open(ELF, "rb") as f:
-        f.seek(SEG_OFF)
-        seg = f.read(SEG_SIZE)
-    strings = {}
-    for m in re.finditer(rb"[\x20-\x7e]{4,}", seg):
-        name = re.search(r"([A-Za-z0-9_]+\.cpp)\b", m.group().decode())
-        if name:
-            strings[SEG_VA + m.start()] = name.group(1)
-    starts = [a for a, _ in funcs]
+    """Return {source .cpp file: index of the first function that references it}."""
     first = {}
-    lui = {}  # register -> (upper value, pc of the lui)
-    for i in range(0, len(seg) - 3, 4):
-        w = struct.unpack_from("<I", seg, i)[0]
-        op, rs, rt, imm = w >> 26, (w >> 21) & 31, (w >> 16) & 31, w & 0xFFFF
-        pc = SEG_VA + i
-        if op == 0x0F:  # lui
-            lui[rt] = (imm << 16, pc)
-        elif op in (0x09, 0x0D) and rs in lui and pc - lui[rs][1] < 96:  # addiu / ori
-            lo = imm - 0x10000 if (op == 0x09 and imm & 0x8000) else imm
-            name = strings.get((lui[rs][0] + lo) & 0xFFFFFFFF)
-            if name:
-                k = bisect.bisect_right(starts, pc) - 1
-                if k >= 0 and pc < funcs[k][0] + funcs[k][1]:
-                    first[name] = min(first.get(name, k), k)
+    for k, names in elfscan.source_refs(funcs, r"([A-Za-z0-9_]+\.cpp)\b").items():
+        for name in names:
+            first[name] = min(first.get(name, k), k)
     return first
 
 
@@ -216,7 +182,7 @@ def badge(shipped, total):
 
 
 def main():
-    funcs = load_functions()
+    funcs = elfscan.load_functions()
     labels = source_file_labels(funcs)
     states, unknown = load_states(funcs)
     os.makedirs(OUT_DIR, exist_ok=True)

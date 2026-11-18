@@ -1,0 +1,16 @@
+// Runtime traffic recorded by runtime_stub.cpp; the harness resets it before each run.
+#pragma once
+#include <cstdint>
+
+namespace theseus_stub
+{
+    struct Events
+    {
+        uint64_t hash = 0xCBF29CE484222325ull;  // fingerprint of everything below, in order
+        long returns = 0;                       // Return dispatches
+        long transfers = 0;                     // calls and jumps out of the function
+        long special_loads = 0, special_stores = 0;  // hardware addresses (runtime Load/Store)
+        long syscalls = 0, breaks = 0, traps = 0, exceptions = 0;
+    };
+    extern Events g_events;
+}

@@ -1,0 +1,2 @@
+a0 ptr          # the string representation
+mem32 @a0+12 u32  # its reference count (edge values reach the 16-bit carry)

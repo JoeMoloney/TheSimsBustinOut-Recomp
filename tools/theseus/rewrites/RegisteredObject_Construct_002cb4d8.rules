@@ -1,0 +1,3 @@
+a0 ptr
+mem32 0x3f838c u32  # list head (gp-0x7764 with the game's gp 0x3FFAF0); only stored, so any value
+mem32 0x3f8390 u32  # next id   (gp-0x7760)

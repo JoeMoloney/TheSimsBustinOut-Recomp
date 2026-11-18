@@ -1,0 +1,2 @@
+a0 ptr              # the string being initialised
+mem32 0x4564fc u32  # the empty rep's reference count (any value, including 0xFFFFFFFF)

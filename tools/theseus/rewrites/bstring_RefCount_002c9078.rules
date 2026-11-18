@@ -1,0 +1,2 @@
+a0 ptr          # the string object
+mem32 @a0+0 ptr # its representation

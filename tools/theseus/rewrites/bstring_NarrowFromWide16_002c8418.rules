@@ -1,0 +1,2 @@
+a0 ptr          # destination (may overlap the source, as in the original)
+a1 wstr16 64    # source: 16-bit characters
