@@ -22,7 +22,7 @@ Per function (one JSON object per line):
     loops                                    eeCheckpointDue() checks = backward branches
     fpu, mmi, cop2                           instruction classes used (COP1, MMI, VU0 macro)
     leaf                                     no calls/jumps out, no syscall/break/trap
-    hand_edited                              contains getenv/cout/cerr added by hand (not
+    hand_edited                              contains getenv/cout/cerr added after generation (not
                                              recompiler output: regenerate before diff-testing)
     callers                                  functions with a direct call to this one
     src, src_guess                           assert evidence (direct) and filled-in source file

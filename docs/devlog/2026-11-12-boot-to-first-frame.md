@@ -266,7 +266,7 @@ throw the buffer away when the run is fine, and **save it only for the first
 run that fails**, together with raw dumps of VU1 code and data memory
 (`SIMS_VU1_TRACE_DIR`).
 
-The failing run's last few instructions, decoded by hand:
+The failing run's last few instructions, decoded step by step:
 
 ```
 0b80  ILW.w  vi3, 0x30(vi0)   ; load "where my packet is" from VU memory

@@ -51,7 +51,7 @@ target_include_directories(sims_supplemental PRIVATE "${SIMS_WORK}/supplemental-
 target_compile_options(sims_supplemental PRIVATE -mavx2 ${SIMS_GENERATED_OPT_LIST})
 target_link_libraries(sims_supplemental PRIVATE ps2_runtime)
 
-# Ship of Theseus: hand-written rewrites that replace recompiled functions (tools/theseus/ship.py
+# Ship of Theseus: readable rewrites that replace recompiled functions (tools/theseus/ship.py
 # generates the overrides file from the ledger; SIMS_THESEUS=0 at run time disables them).
 add_executable(sims_boot_probe "${SIMS_REPO}/tools/boot_probe.cpp"
     "${SIMS_REPO}/tools/theseus/shipped/theseus_overrides.cpp"

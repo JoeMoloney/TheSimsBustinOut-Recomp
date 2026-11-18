@@ -1,4 +1,4 @@
-// Helpers for hand-written Theseus rewrites of recompiled guest functions.
+// Helpers for Theseus rewrites of recompiled guest functions.
 //
 // A rewrite has the same signature as the generated function it replaces (it may call other
 // guest functions with g.call(); see below):
