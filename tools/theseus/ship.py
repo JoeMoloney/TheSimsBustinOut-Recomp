@@ -3,7 +3,9 @@
 
 Usage (from the repo root):
     python3 tools/theseus/ship.py            # regenerate tools/theseus/shipped/theseus_overrides.cpp
-    python3 tools/theseus/ship.py --confirm  # after the in-game check: ledger rows gated -> shipped
+    python3 tools/theseus/ship.py --confirm [NAME ...]
+                                             # after the in-game check: ledger rows gated -> shipped
+                                             # (only the named ones, e.g. those with calls > 0)
 
 The generated file #includes every rewrite whose ledger row is `gated` or `shipped` (so the
 game runs exactly the code the gate tested) and defines registerTheseusOverrides(), which the
@@ -83,9 +85,11 @@ def read_ledger():
 def main():
     rows = read_ledger()
     if "--confirm" in sys.argv:
+        # --confirm [NAME ...]: only the named rows (those the in-game run exercised); no names = all
+        names = set(sys.argv[sys.argv.index("--confirm") + 1:])
         n = 0
         for r in rows:
-            if r["status"] == "gated":
+            if r["status"] == "gated" and (not names or r["name"] in names):
                 r["status"] = "shipped"
                 n += 1
         with open(LEDGER, "w", newline="") as f:
@@ -99,13 +103,14 @@ def main():
     includes, wrappers, table = [], [], []
     for i, r in enumerate(ship):
         name = r["name"]
-        calls_out = "g.call(" in open(os.path.join(HERE, "rewrites", name + ".cpp")).read()
+        with open(os.path.join(HERE, "rewrites", name + ".cpp")) as src:
+            calls_out = "g.call(" in src.read()
         addr = int(re.search(r"_([0-9a-fA-F]{6,8})$", name).group(1), 16)
         # Each rewrite in its own namespace: their file-local helpers (constants, lambdas) may
         # share names. theseus.h is already included above, so its #pragma once skips it here.
         includes.append(f"namespace rw{i}\n{{\n#include \"rewrites/{name}.cpp\"\n}}")
         wrappers.append(f"    void call_{i}(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)\n"
-                        f"    {{\n        g_calls[{i}].fetch_add(1, std::memory_order_relaxed);\n"
+                        f"    {{\n        g_calls[{i}].fetch_add(1, std::memory_order_relaxed);\n" +
                         (f"        ps2x::native::runOnFiber(*runtime, rw{i}::{name}, rdram, ctx);  // calls guest code\n    }}"
                          if calls_out else f"        rw{i}::{name}(rdram, ctx, runtime);\n    }}"))
         table.append(f'        {{"{name}", 0x{addr:06x}u, call_{i}}},')

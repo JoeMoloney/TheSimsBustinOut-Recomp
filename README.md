@@ -43,7 +43,7 @@ playable in a meaningful way.
 ![Ship of Theseus progress map](docs/progress/theseus-map.svg)
 
 Each square is one recompiled function of `SLES_520.48`, in address order. **Red** squares are still
-machine-generated code. As functions are rewritten by hand they go **amber** (in progress), **light green**
+machine-generated code. As functions are rewritten they go **amber** (in progress), **light green**
 (diff-tested: the rewrite matched the original on 200,000 random CPU states) and **dark green** (shipped in
 the game build). The linker keeps each source file's functions together, so whole files and subsystems
 fill in as blocks. The game has no symbols, so the labels come from assert messages left in the release
