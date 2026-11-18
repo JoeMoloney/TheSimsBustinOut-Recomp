@@ -9,7 +9,7 @@ operating-system services the game uses (threads, semaphores, IOP modules, memor
 provided by PS2Recomp's runtime, extended with the fixes this game needed.
 
 The long-term plan is a **Ship of Theseus**: replace the machine-generated functions one at a time with
-readable, hand-written code that is proven to behave identically, until none of the original remains.
+readable code that is proven to behave identically, until none of the original remains.
 This repo is also a reference for a future Rust rewrite.
 
 ## Important note
