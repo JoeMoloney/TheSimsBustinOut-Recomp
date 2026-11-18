@@ -1,0 +1,16 @@
+# clangd project config. Reference: https://clangd.llvm.org/config
+# Paths are relative to this file's directory (the repo root).
+
+# Fragment 1: applies to every file
+CompileFlags:
+  # Where to find compile_commands.json (clangd doesn't search build/probe on its own)
+  CompilationDatabase: build/probe
+
+---
+# Fragment 2: only for generated recompiler output (~11k files)
+If:
+  PathMatch: work/.*
+Index:
+  # Don't background-index these. Opening one still works,
+  # but they won't clutter "find references" or eat CPU and disk.
+  Background: Skip

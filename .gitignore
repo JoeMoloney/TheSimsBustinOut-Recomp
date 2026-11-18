@@ -6,6 +6,7 @@
 /build/
 /dist/
 /out/
+/.cache/
 
 # Logs and binaries
 *.log
