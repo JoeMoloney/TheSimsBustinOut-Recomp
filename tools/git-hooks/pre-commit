@@ -1,0 +1,16 @@
+#!/bin/sh
+# Regenerate the Ship of Theseus progress images whenever the ledger is part of a commit.
+# Enable once per clone:  git config core.hooksPath tools/git-hooks
+# Git runs hooks from the top of the work tree, so the paths below are repo-relative.
+
+LEDGER=tools/theseus/batch/ledger.tsv
+ELF=work/sims-bustin-out/disc-files/SLES_520.48
+
+if git diff --cached --name-only | grep -qx "$LEDGER"; then
+    if [ ! -f "$ELF" ]; then
+        echo "pre-commit: $ELF not found; progress map NOT regenerated (needs the game files)." >&2
+        exit 0
+    fi
+    python3 tools/theseus/progress.py || exit 1   # a failure blocks the commit
+    git add docs/progress/theseus-map.svg docs/progress/theseus-badge.svg
+fi
