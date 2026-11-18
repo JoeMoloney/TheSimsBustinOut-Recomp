@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.21)
 project(SimsBustinOutProbe LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # writes built/probe/compile_commands.json for clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # writes build/probe/compile_commands.json for clangd
 
 get_filename_component(SIMS_REPO "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 set(SIMS_WORK "${SIMS_REPO}/work/sims-bustin-out")
