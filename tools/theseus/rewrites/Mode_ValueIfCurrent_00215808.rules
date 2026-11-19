@@ -1,0 +1,3 @@
+a0 oneof 0 1 2 3 0xffffffff 0x80000000
+mem32 0x3f92bc oneof 0 1 2 3 0xffffffff 0x80000000
+mem32 0x3f92b4 u32

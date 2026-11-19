@@ -1,0 +1,5 @@
+a1 ptr
+mem32 @a1+0x18 fixed 0x01008000
+mem32 0x010080c0 oneof 0 0x01009000
+mem32 0x0100900c u32
+mem32 0xc fixed 7   # a null object read through would see 7

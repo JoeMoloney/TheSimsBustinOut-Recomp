@@ -1,0 +1,2 @@
+a0 ptr_or_null
+mem32 0x0 fixed 0x00410041   # a null string read through would have length 2

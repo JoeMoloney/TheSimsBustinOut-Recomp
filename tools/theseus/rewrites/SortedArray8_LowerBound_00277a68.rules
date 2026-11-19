@@ -1,0 +1,9 @@
+a0 ptr
+mem32 @a0+0x4 oneof 0 1 2 3 5 0xffffffff
+mem32 @a0+0x0 fixed 0x01008000
+mem32 0x01008000 fixed 10
+mem32 0x01008008 fixed 20
+mem32 0x01008010 fixed 20      # duplicate: a match is not the lower bound
+mem32 0x01008018 fixed 0x10005
+mem32 0x01008020 fixed 0x20000
+a1 oneof 5 10 15 20 0x10005 0x10000 0x5 0x20000 0x20001 0x80000000

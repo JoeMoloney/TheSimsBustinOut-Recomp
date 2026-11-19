@@ -1,0 +1,14 @@
+a0 fixed 0x01004000   # fixed: a random a0 near 0x01008000 would make a0+0x30 overlap the nodes
+mem32 @a0+0x30 oneof 0 0x01008000
+mem32 0x0100800c oneof 0 1 0x10000
+mem32 0x01008000 oneof 0 1 3
+mem32 0x01008008 oneof 1 5 0xfffffffe 100
+mem32 0x0100801c oneof 0 0x01008100
+mem32 0x0100810c oneof 0 1 0x10000
+mem32 0x01008100 oneof 0 1 3
+mem32 0x01008108 oneof 1 5 0xfffffffe 100
+mem32 0x0100811c oneof 0 0x01008200
+mem32 0x0100820c oneof 0 1 0x10000
+mem32 0x01008200 oneof 0 1 3
+mem32 0x01008208 oneof 1 5 0xfffffffe 100
+mem32 0x0100821c fixed 0

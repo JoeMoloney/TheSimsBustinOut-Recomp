@@ -1,0 +1,2 @@
+a0 ptr
+mem32 @a0+0x12c oneof 6 0 0xffffffff 7 5 0x10006

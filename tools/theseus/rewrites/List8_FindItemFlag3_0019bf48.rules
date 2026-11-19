@@ -1,0 +1,8 @@
+a0 ptr
+mem32 @a0+0x0 oneof 0 0x01008000        # head: empty or up to 2 nodes
+mem32 0x01008000 fixed 0x01009000
+mem32 0x01008008 oneof 0 0x01008100
+mem32 0x01008100 fixed 0x01009100
+mem32 0x01008108 fixed 0
+mem32 0x01009018 oneof 0 8 0xfffffff7 0xffffffff 0x10 7
+mem32 0x01009118 oneof 0 8 7 0xffffffff

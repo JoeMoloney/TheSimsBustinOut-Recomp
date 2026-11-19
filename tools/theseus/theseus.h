@@ -75,6 +75,24 @@ namespace theseus
             SET_GPR_S32(ctx, 2, value);
             ret_void();
         }
+        // Return all 64 bits of v0 (doubles and 64-bit integers: ee-gcc returns them in v0, and
+        // the harness's ABI check covers only v0's low 32 bits, so expect PASS-STRICT).
+        void ret64(uint64_t value) const
+        {
+            SET_GPR_U64(ctx, 2, value);
+            ret_void();
+        }
+        // Return `low` in v0's low 64 bits with the upper 64 bits of another register's entry value:
+        // what `movz/movn v0, rX, ...` leaves, since it copies all 128 bits of rX and the
+        // generated setters (SET_GPR_S32/U64) keep a register's upper half. Pass GPR_VEC(ctx, X)
+        // read at entry. (The ABI compare covers v0's low 32 bits only; the caller check sees
+        // any v0 difference.)
+        void ret_with_upper(uint64_t low, __m128i upper_from) const
+        {
+            SET_GPR_VEC(ctx, 2, _mm_unpacklo_epi64(_mm_cvtsi64_si128(static_cast<int64_t>(low)),
+                                                   _mm_unpackhi_epi64(upper_from, upper_from)));
+            ret_void();
+        }
         // Return a value that the original copies with `daddu v0, aN, $zero` (all 64 bits).
         void ret_copy_of_arg(int i) const
         {

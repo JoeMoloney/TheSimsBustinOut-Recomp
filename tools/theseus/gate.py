@@ -36,6 +36,10 @@ OUT = os.path.join(REPO, "out/theseus/gate")
 COLUMNS = ["name", "tier", "status", "gate", "kill_rate", "batch", "note"]
 KEEP_STATUS = {"reviewed", "shipped", "rejected"}
 MUTANT_CASES = 20000
+# A mutant that breaks a loop condition can loop forever (tree/list walks); a timeout counts as
+# killed. 20,000 correct cases take a few seconds, so 60 s only cuts off runaway mutants
+# (difftest's own default is 600 s, which made every such mutant cost 10 minutes).
+MUTANT_TIMEOUT = 60
 
 # (pattern, replacement) pairs applied one occurrence at a time to code lines of the rewrite.
 SWAPS = [(r"!=", "=="), (r"==", "!="), (r"<=", "<"), (r"(?<![<-])<(?![<=])", "<="),
@@ -127,7 +131,8 @@ def gate(name, batch):
         with open(path, "w") as f:
             f.write(text_src)
         code, text = run([sys.executable, os.path.join(HERE, "difftest.py"), name, "--rewrite", path,
-                          "--variant", "mutant", "--cases", str(MUTANT_CASES)], env)
+                          "--variant", "mutant", "--cases", str(MUTANT_CASES),
+                          "--timeout", str(MUTANT_TIMEOUT)], env)
         if "compile failed" in text:
             errors.append(f"line {lineno}: {what} (does not compile)")
         elif code != 0:

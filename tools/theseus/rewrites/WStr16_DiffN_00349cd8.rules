@@ -1,0 +1,4 @@
+a0 swstr16 6
+a1 swstr16 6
+a2 oneof 0 1 2 3 8 0x10002 0xffff 0x20000
+uncovered 0x349d00 taken  reached only with c1 == c2 and c1 != 0, so c2 != 0

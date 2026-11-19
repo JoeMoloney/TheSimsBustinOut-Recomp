@@ -1,0 +1,4 @@
+a0 ptr
+mem32 @a0+0x4 oneof 0 1 31 32 33 100 0x80000000 0xffffffff
+mem32 @a0+0x0 ptr
+a1 len 120

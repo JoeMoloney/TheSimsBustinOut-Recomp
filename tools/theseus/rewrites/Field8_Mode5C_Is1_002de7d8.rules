@@ -1,0 +1,4 @@
+a0 ptr
+mem32 @a0+0x8 oneof 0 0x01008000
+mem32 0x0100805c oneof 0 4 8 0xc 0xfffffff7 5 0xfffffff3
+mem32 0x5c fixed 4   # a null object read through would see mode 1

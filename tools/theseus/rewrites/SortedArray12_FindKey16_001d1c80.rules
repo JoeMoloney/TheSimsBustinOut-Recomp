@@ -1,0 +1,8 @@
+a0 fixed 0x01008000
+a1 oneof 0x01008000 0x0100800c 0x01008018 0x01008024 0x0100803c 0x01008004 0x01007ff4
+a2 oneof 0xffffffec 0xfffffffb 10 11 20 21 30 5 0xffff8000 55 0xffffffed 9
+mem32 0x01008008 fixed 0xffec   # -20
+mem32 0x01008014 fixed 0xfffb   # -5: the midpoint of 2..5 elements reads it
+mem32 0x01008020 fixed 10
+mem32 0x0100802c fixed 11   # next to 10: a difference of 1 matters
+mem32 0x01008038 fixed 30

@@ -1,0 +1,4 @@
+a1 oneof 0 1 2 3 0xffffffff 0x80000000 0x7fffffff 0xfffffffe
+mem32 0x3f92c8 u32
+mem32 0x3f92cc u32
+mem32 0x3f92d0 u32   # the word after the table: index 2 must not read it

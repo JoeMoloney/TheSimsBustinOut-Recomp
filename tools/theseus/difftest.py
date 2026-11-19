@@ -16,6 +16,7 @@ Builds with the game's own compile flags (from build/probe/compile_commands.json
 out/theseus/difftest/<rewrite>/{difftest, build.log, result.txt}. Exit status 0 = PASS.
 """
 import argparse
+import fcntl
 import hashlib
 import json
 import os
@@ -38,7 +39,9 @@ REG_NAMES.update({"v0": 2, "v1": 3, "gp": 28, "sp": 29, "fp": 30, "ra": 31})
 REG_NAMES.update({f"s{i}": 16 + i for i in range(8)})
 KINDS = {"any": "kAny", "ptr": "kPtr", "ptr_or_null": "kPtrOrNull", "int": "kInt", "u32": "kU32",
          "len": "kLen", "slen": "kSLen", "fixed": "kFixed", "oneof": "kOneOf",
-         "str": "kStr8", "wstr16": "kStr16", "wstr32": "kStr32", "aptr": "kAPtr", "alen": "kALen"}
+         "str": "kStr8", "wstr16": "kStr16", "wstr32": "kStr32", "aptr": "kAPtr", "alen": "kALen",
+         "sstr": "kSStr8", "swstr16": "kSStr16", "swstr32": "kSStr32",
+         "tree_node": "kTreeNode", "vec": "kVec", "double": "kDouble"}
 
 
 def die(msg):
@@ -61,10 +64,10 @@ def kind_and_value(words, where):
         die(f"{where}: expected one of {', '.join(KINDS)}")
     kind, rest = words[0], words[1:]
     if kind == "oneof":
-        if not 1 <= len(rest) <= 8:
-            die(f"{where}: oneof takes 1..8 values")
+        if not 1 <= len(rest) <= 16:
+            die(f"{where}: oneof takes 1..16 values")
         return KINDS[kind], 0, [int(v, 0) for v in rest]
-    needs_value = kind in ("len", "slen", "fixed", "str", "wstr16", "wstr32", "alen")
+    needs_value = kind in ("len", "slen", "fixed", "str", "wstr16", "wstr32", "alen", "sstr", "swstr16", "swstr32", "vec")
     if needs_value != bool(rest):
         die(f"{where}: {kind} {'needs a value' if needs_value else 'takes no value'}")
     return KINDS[kind], int(rest[0], 0) if rest else 0, []
@@ -72,7 +75,7 @@ def kind_and_value(words, where):
 
 def rules_inc(path):
     """Turn a .rules file into the C++ tables the harness includes."""
-    args, mems, datas = [], [], []
+    args, mems, datas, tree = [], [], [], 0
     for n, line in enumerate(open(path), 1):
         words = line.split("#", 1)[0].split()
         if not words:
@@ -80,6 +83,13 @@ def rules_inc(path):
         where = f"{os.path.basename(path)}:{n}"
         if words[0] == "uncovered":
             continue  # read by uncovered_allowed()
+        if words[0] == "tree":
+            if len(words) != 2:
+                die(f"{where}: tree <max nodes>")
+            tree = int(words[1], 0)
+            if not 0 < tree <= 400:
+                die(f"{where}: tree takes 1..400 nodes (16 KB at 0x0100C000)")
+            continue
         if words[0] == "mem32":
             if len(words) < 3:
                 die(f"{where}: mem32 <addr|@reg+off|*addr+off> <kind> [value]")
@@ -110,7 +120,8 @@ def rules_inc(path):
             for a, k, v, b, d, al in mems] or ["    {0, kAny, 0, 0, 0, {}, 0},"]
     out += ["};", "const DataRule kDataRules[] = {"]
     out += [f'    {{0x{a:x}u, "{h}"}},' for a, h in datas] or ['    {0u, ""},']
-    out += ["};"]
+    out += ["};", f"constexpr size_t kMemRuleCount = {len(mems)}, kDataRuleCount = {len(datas)};",
+            f"constexpr uint32_t kTreeMax = {tree};"]
     return "\n".join(out) + "\n"
 
 
@@ -228,6 +239,12 @@ def build(name, rewrite_cpp, orig, rules, outdir, variant=None):
     symbol = re.search(r"^void (\w+)\(uint8_t\* rdram", open(src).read(), re.M).group(1)
     flags = game_flags() + [f"-I{HERE}", f"-I{HARNESS}"]
     flags_file = os.path.join(shared, "flags.txt")  # a flag change rebuilds everything
+    # Parallel runs (gate.py -j, xargs -P) share flags.txt and runtime_stub.o: after a header
+    # change they would all rebuild the shared object at once and some links would read a
+    # half-written file. One process at a time writes them (exclusive lock); links read them
+    # under a shared lock.
+    shared_lock = open(os.path.join(shared, ".lock"), "w")
+    fcntl.flock(shared_lock, fcntl.LOCK_EX)
     write_if_changed(flags_file, " ".join(flags) + "\n")
     rules_inc_path = os.path.join(outdir, "difftest_rules.inc")
     write_if_changed(rules_inc_path, rules_inc(rules) if rules else "")
@@ -248,31 +265,39 @@ def build(name, rewrite_cpp, orig, rules, outdir, variant=None):
         (os.path.join(outdir, "bind.o"), bind, [], [bind, flags_file]),
     ]
     log = open(os.path.join(outdir, f"build-{variant}.log" if variant else "build.log"), "w")
-    procs = []
-    for obj, source, extra, inputs in units:
-        cmd = ["c++"] + flags + extra + ["-c", source, "-o", obj]
-        key = stamp(cmd, [source] + inputs)
-        stamp_file = obj + ".stamp"
-        if os.path.exists(obj) and os.path.exists(stamp_file) and open(stamp_file).read() == key:
-            continue
-        if os.path.exists(stamp_file):
-            os.unlink(stamp_file)  # invalid until this compile succeeds
-        log.write(" ".join(shlex.quote(c) for c in cmd) + "\n")
-        log.flush()
-        procs.append((obj, stamp_file, key, subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT)))
-    failed = []
-    for obj, stamp_file, key, p in procs:
-        if p.wait():
-            failed.append(obj)
-        else:
-            with open(stamp_file, "w") as f:
-                f.write(key)
-    if failed:
-        die(f"compile failed, see {os.path.relpath(log.name, REPO)}")
+
+    def compile_units(selected):
+        procs = []
+        for obj, source, extra, inputs in selected:
+            cmd = ["c++"] + flags + extra + ["-c", source, "-o", obj]
+            key = stamp(cmd, [source] + inputs)
+            stamp_file = obj + ".stamp"
+            if os.path.exists(obj) and os.path.exists(stamp_file) and open(stamp_file).read() == key:
+                continue
+            if os.path.exists(stamp_file):
+                os.unlink(stamp_file)  # invalid until this compile succeeds
+            log.write(" ".join(shlex.quote(c) for c in cmd) + "\n")
+            log.flush()
+            procs.append((obj, stamp_file, key, subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT)))
+        failed = []
+        for obj, stamp_file, key, p in procs:
+            if p.wait():
+                failed.append(obj)
+            else:
+                with open(stamp_file, "w") as f:
+                    f.write(key)
+        if failed:
+            die(f"compile failed, see {os.path.relpath(log.name, REPO)}")
+
+    shared_units = [u for u in units if u[0].startswith(shared)]
+    compile_units(shared_units)                     # under the exclusive lock
+    fcntl.flock(shared_lock, fcntl.LOCK_SH)         # others may read, nobody rewrites
+    compile_units([u for u in units if u not in shared_units])
     exe = os.path.join(outdir, f"difftest-{variant}" if variant else "difftest")
     link = ["c++", "-o", exe] + [u[0] for u in units]
     if subprocess.run(link, stdout=log, stderr=subprocess.STDOUT).returncode:
         die(f"link failed, see {os.path.relpath(log.name, REPO)}")
+    shared_lock.close()
     return exe, symbol
 
 

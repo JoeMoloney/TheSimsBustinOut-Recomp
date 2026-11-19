@@ -1,0 +1,10 @@
+a0 ptr
+a1 ptr
+mem32 @a0+0x4 oneof 0 1 0x80000000
+mem32 @a1+0x4 oneof 0 1 0x80000000
+mem32 @a0+0x0 oneof 0 1 0x80000000
+mem32 @a1+0x0 oneof 0 1 0x80000000
+uncovered 0x2d118c taken  after the jr $ra at 0x2d1180: another function the map joined
+uncovered 0x2d118c not    same
+uncovered 0x2d11ac taken  same
+uncovered 0x2d11ac not    same

@@ -1,0 +1,6 @@
+a1 oneof 0 0x01008000           # empty or a chain of up to 2 nodes
+mem32 0x01008000 oneof 0 1 0x80000000
+mem32 0x01008014 oneof 0 0x01008100
+mem32 0x01008100 oneof 0 5
+mem32 0x01008114 fixed 0
+mem32 0x0 fixed 1                  # a null list read through would count a node

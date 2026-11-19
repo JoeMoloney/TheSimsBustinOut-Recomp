@@ -1,0 +1,5 @@
+a0 ptr
+mem32 @a0+0x0 oneof 0 0x01008000   # head: empty or a chain of up to 3 nodes
+mem32 0x01008000 oneof 0 0x01008100
+mem32 0x01008100 oneof 0 0x01008200
+mem32 0x01008200 fixed 0

@@ -1,0 +1,5 @@
+mem32 0x3f84d8 oneof 0 1 0x10000 0x1000000
+mem32 0x3f92e8 oneof 0 1 0x10000
+mem32 0x3f92ec oneof 0 1 0x10000
+mem32 0x3f84dc fixed 0   # the next global: a misaligned read of the first would see it
+mem32 0x3f84d4 fixed 0   # the word before it, for a read one byte early

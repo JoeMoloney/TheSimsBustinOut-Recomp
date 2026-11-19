@@ -75,6 +75,7 @@ void registerTheseusOverrides(PS2Runtime &runtime)
 
 void printTheseusStats()
 {{
+    std::printf("\\n");  // the runtime's "[run] exiting loop" line has no newline
     for (const Override &o : kOverrides)
         if (!o.copy)  // counts include calls through identical copies
             std::printf("[theseus] %-40s 0x%06x calls=%llu\\n", o.name, o.address,
