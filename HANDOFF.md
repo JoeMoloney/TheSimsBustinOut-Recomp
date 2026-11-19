@@ -1,6 +1,17 @@
 # Sims Bustin' Out Recomp — Handoff
 
-Last updated: 2026-11-18
+Last updated: 2026-11-19
+
+## November 19: THESEUS SPEED-UP TOOLS (coverage, queue, packets, rule drafts, identical copies) → next: batch 2
+
+- **Why:** writing the rewrite (mostly its input rules) is the serial step; Fable II did batches of 25/50/25 (not 100). These tools cut setup and the rules/gate round trips before a bigger batch.
+- **Branch coverage in the diff test:** `difftest.py` compiles an instrumented copy of the original (`original_cov.cpp`: `theseus_cov(<branch>, taken)` after every conditional branch; `b`/`beq $x,$x` skipped) and prints `COVERAGE ok|GAP (n/m branch directions reached)` plus `coverage gap: 0x... never taken / never falls through`. **`gate.py` fails on a gap**; a direction no valid input reaches goes in the `.rules` file as `uncovered 0xADDR taken|not <reason>`. All 27 existing rewrites: no gaps. Negative control: Mem_Copy with `a2 alen 3` still gives PASS-ABI but now 6 gaps.
+- **`batch_pool.py`** → `out/theseus/batch/queue.jsonl`: integer leaves below the Sony SDK (0x376000), grouped by identical bytes. 1,609 entries = 2,663 functions. Tiers A (callers, no stores) 270, B (stores) 417, D (no direct callers) 327, T (≤3 instructions) 595 entries / 1,569 functions (517 empty `jr $ra`, 168 `return 0`, 96 `return 1`). Top of A includes 0x102240 (a busy-wait loop, `a1` iterations of 5 nops) with 16 copies. Deferred from batch 1 and still in the queue: 0x12b108 (`_Rb_tree_increment`), 0x2b5230.
+- **Identical copies:** a rewrite header `// theseus: copies 0x..., 0x...` makes `ship.py` register it at each copy (refuses unless the bytes are identical), `caller_usage.py` check every copy's callers, `progress.py` colour every copy. Overrides now carry a counter index (copies share it; stats print one line per rewrite). `SByte3_Copy_002cc050` is a separate rewrite of a copy of 0x2cbf58; could become a `copies` line.
+- **`batch_packet.py`** → `out/theseus/batch/<addr>/packet.md` + `draft.rules`: disassembly with labels (the recompiler leaves out `nop` delay slots), call sites (caller instructions before the `jal`), copies, source guess, drafted rules with evidence. The drafter follows where values come from (argument, field, global, constant) without following branches: pointer bases → `ptr`/`ptr_or_null`/`mem32 @aN+off ptr`/`mem32 0xADDR ptr`; zero-tested character loads in a loop → `str`/`wstr16`/`wstr32`; loop counters and indexes → `len`; compared constants → `oneof` with neighbours; other arguments in loop functions → `len 256`.
+- **Draft quality, measured on the 27 existing rewrites** (draft instead of the hand rules, 20k cases): **21/27 pass with full coverage unchanged**; the other 6 are all caught (coverage gaps in BitArray, SByte3_SetClamped, the 3 TypeTags; Mem_Copy timed out with `a2 u32`, now `len 256`). Not measured: mutant kill rate with drafts.
+- **Checked:** gate on SByte3_SetClamped (PASS, 23/23 mutants, branches 4/4); probe rebuilt; 40 s headless: `27 rewrites active at 27 addresses`, call counts printed.
+- **Next session:** batch 2 = top 50 of tiers A+B (`batch_pool.py --top 50 A B`, `batch_packet.py --next 50 A B`), start each `.rules` from `draft.rules`, gate at `-j 12` with `--batch 2`, time it against Fable's ~2–4 min per rewrite. Then the first non-leaf rewrite (see Nov 18 below).
 
 ## November 18 (end of day): NATIVE FIBERS IN THE RUNTIME → next: first non-leaf rewrite
 

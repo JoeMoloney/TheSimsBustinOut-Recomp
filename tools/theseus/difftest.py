@@ -78,6 +78,8 @@ def rules_inc(path):
         if not words:
             continue
         where = f"{os.path.basename(path)}:{n}"
+        if words[0] == "uncovered":
+            continue  # read by uncovered_allowed()
         if words[0] == "mem32":
             if len(words) < 3:
                 die(f"{where}: mem32 <addr|@reg+off|*addr+off> <kind> [value]")
@@ -110,6 +112,54 @@ def rules_inc(path):
     out += [f'    {{0x{a:x}u, "{h}"}},' for a, h in datas] or ['    {0u, ""},']
     out += ["};"]
     return "\n".join(out) + "\n"
+
+
+RE_BRANCH = re.compile(r"^(\s*)const bool branch_taken_0x([0-9a-f]+) = \((.*)\);$", re.M)
+ALWAYS = re.compile(r"GPR_U64\(ctx, (\d+)\) == GPR_U64\(ctx, \1\)")  # `b` / `beq $x, $x`: unconditional
+
+
+def instrument(text):
+    """The original with a coverage call after every conditional branch decision:
+    theseus_cov(<branch address>, taken). Behaviour is unchanged; the harness counts both
+    directions and difftest.py reports the ones no case reached."""
+    def add(m):
+        if ALWAYS.fullmatch(m.group(3)):
+            return m.group(0)
+        return m.group(0) + f"\n{m.group(1)}theseus_cov(0x{m.group(2)}u, branch_taken_0x{m.group(2)});"
+    return ("#include <cstdint>\nvoid theseus_cov(uint32_t branch, bool taken);  // difftest_harness.cpp\n"
+            + RE_BRANCH.sub(add, text))
+
+
+def uncovered_allowed(path):
+    """{(address, 'taken'|'not')} from `uncovered 0xADDR taken|not <reason>` lines in a .rules file:
+    branch directions that no valid input reaches (each needs a reason)."""
+    allowed = set()
+    if path and os.path.exists(path):
+        for n, line in enumerate(open(path), 1):
+            words = line.split("#", 1)[0].split()
+            if words and words[0] == "uncovered":
+                if len(words) < 4 or words[2] not in ("taken", "not"):
+                    die(f"{os.path.basename(path)}:{n}: uncovered 0xADDR taken|not <reason>")
+                allowed.add((int(words[1], 16), words[2]))
+    return allowed
+
+
+def instrumented_branches(text):
+    return [int(m.group(2), 16) for m in RE_BRANCH.finditer(text) if not ALWAYS.fullmatch(m.group(3))]
+
+
+def coverage_gaps(text, branches, allowed):
+    """['0x2ac6b8 never taken', ...] from the harness's `branch` lines, minus allowed ones."""
+    seen = {int(m.group(1), 16): (int(m.group(2)), int(m.group(3))) for m in
+            re.finditer(r"^branch 0x([0-9a-f]+) taken=(\d+) not_taken=(\d+)$", text, re.M)}
+    gaps = []
+    for addr in branches:
+        taken, not_taken = seen.get(addr, (0, 0))
+        if not taken and (addr, "taken") not in allowed:
+            gaps.append(f"0x{addr:06x} never taken")
+        if not not_taken and (addr, "not") not in allowed:
+            gaps.append(f"0x{addr:06x} never falls through")
+    return gaps
 
 
 def game_flags():
@@ -183,6 +233,8 @@ def build(name, rewrite_cpp, orig, rules, outdir, variant=None):
     write_if_changed(rules_inc_path, rules_inc(rules) if rules else "")
     bind = os.path.join(outdir, "bind.cpp")
     write_if_changed(bind, BIND.format(orig=symbol, rewrite=name))
+    orig_cov = os.path.join(outdir, "original_cov.cpp")
+    write_if_changed(orig_cov, instrument(open(src).read()))
     own_headers = [os.path.join(HERE, "theseus.h"), os.path.join(HARNESS, "runtime_stub.h"), flags_file]
     harness_src = os.path.join(HARNESS, "difftest_harness.cpp")
     units = [  # (object, source, extra flags, inputs that force a rebuild)
@@ -190,7 +242,7 @@ def build(name, rewrite_cpp, orig, rules, outdir, variant=None):
          [f"-I{outdir}"] + (["-DHAS_RULES"] if rules else []), [harness_src, rules_inc_path] + own_headers),
         (os.path.join(shared, "runtime_stub.o"), os.path.join(HARNESS, "runtime_stub.cpp"), [],
          [os.path.join(HARNESS, "runtime_stub.cpp")] + own_headers),
-        (os.path.join(outdir, "original.o"), src, [], [src, flags_file]),
+        (os.path.join(outdir, "original.o"), orig_cov, [f"-I{os.path.dirname(src)}"], [orig_cov, flags_file]),
         (os.path.join(outdir, f"rewrite-{variant}.o" if variant else "rewrite.o"), rewrite_cpp, [],
          [rewrite_cpp] + own_headers),
         (os.path.join(outdir, "bind.o"), bind, [], [bind, flags_file]),
@@ -252,6 +304,11 @@ def main():
         text, code = run.stdout + run.stderr, run.returncode
     except subprocess.TimeoutExpired:
         text, code = f"RESULT FAIL (timeout after {a.timeout:.0f} s)\n", 1
+    if not os.environ.get("DIFFTEST_STOP"):
+        branches = instrumented_branches(open(os.path.join(REPO, orig["file"])).read())
+        gaps = coverage_gaps(text, branches, uncovered_allowed(rules))
+        text += (f"COVERAGE {'GAP' if gaps else 'ok'} ({2 * len(branches) - len(gaps)}/{2 * len(branches)} branch directions"
+                 f" reached)" + "".join(f"\n  coverage gap: {g}" for g in gaps) + "\n")
     with open(os.path.join(outdir, f"result-{a.variant}.txt" if a.variant else "result.txt"), "w") as f:
         f.write(text)
     print(text, end="")

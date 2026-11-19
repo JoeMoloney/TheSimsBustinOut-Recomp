@@ -77,3 +77,33 @@ def fill_source_files(n, refs, max_gap=60):
             for k in range(a + 1, b):
                 filled[k] = direct[a]
     return direct, filled
+
+
+# ---------------------------------------------------------------- identical copies
+# A function the compiler emitted several times (inline copies, template instances) has
+# byte-identical bodies. One rewrite then serves every copy: its source names them in a line
+#     // theseus: copies 0x2cc050, 0x2cc0a0
+# ship.py registers it at each one (after re-checking the bytes), caller_usage.py checks the
+# callers of each, and progress.py colours each. Branches are PC-relative and leaves contain no
+# absolute jumps out, so identical bytes mean identical behaviour.
+REWRITES = os.path.join(REPO, "tools/theseus/rewrites")
+RE_COPIES = re.compile(r"^//\s*theseus: copies\s+(.+)$", re.M)
+
+
+def segment():
+    with open(ELF, "rb") as f:
+        f.seek(SEG_OFF)
+        return f.read(SEG_SIZE)
+
+
+def body(seg, addr, n_insns):
+    return seg[addr - SEG_VA: addr - SEG_VA + 4 * n_insns]
+
+
+def rewrite_copies(name):
+    """Addresses listed in the rewrite's `// theseus: copies` line (empty if none)."""
+    path = os.path.join(REWRITES, name + ".cpp")
+    if not os.path.exists(path):
+        return []
+    m = RE_COPIES.search(open(path).read())
+    return [int(a, 16) for a in re.findall(r"0x[0-9a-fA-F]+", m.group(1))] if m else []

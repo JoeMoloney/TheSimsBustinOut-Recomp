@@ -86,7 +86,10 @@ def load_states(funcs):
             if addr not in index:
                 unknown.append(row["name"])
                 continue
-            states[index[addr]] = STATUS_STAGE.get(row["status"].strip(), PROGRESS)
+            stage = STATUS_STAGE.get(row["status"].strip(), PROGRESS)
+            for a in [addr] + elfscan.rewrite_copies(row["name"]):  # identical copies share the rewrite
+                if a in index:
+                    states[index[a]] = stage
     return states, unknown
 
 

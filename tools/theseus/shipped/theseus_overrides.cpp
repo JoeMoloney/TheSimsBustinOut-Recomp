@@ -123,9 +123,11 @@ namespace
         const char *name;
         uint32_t address;
         PS2Runtime::RecompiledFunction fn;
+        unsigned counter;  // index into g_calls (identical copies share their rewrite's counter)
+        bool copy;
     };
 
-    std::atomic<uint64_t> g_calls[27];
+    std::atomic<uint64_t> g_calls[27];  // one per rewrite
 
     void call_0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
     {
@@ -264,33 +266,33 @@ namespace
     }
 
     const Override kOverrides[] = {
-        {"BitArray_Read_002ac6b8", 0x2ac6b8u, call_0},
-        {"Field584_PositiveElse5BC_0015c9b8", 0x15c9b8u, call_1},
-        {"Flags38_SetBit28_00187390", 0x187390u, call_2},
-        {"Flags_HasAll_00345150", 0x345150u, call_3},
-        {"GlobalTable_EntryFieldC_00258248", 0x258248u, call_4},
-        {"Mem_Copy_00268588", 0x268588u, call_5},
-        {"Mode_TryEnter_002157c0", 0x2157c0u, call_6},
-        {"RegisteredObject_Construct_002cb4d8", 0x2cb4d8u, call_7},
-        {"SByte3_Copy_002cbf58", 0x2cbf58u, call_8},
-        {"SByte3_Copy_002cc050", 0x2cc050u, call_9},
-        {"SByte3_FromFixed4_002cbf78", 0x2cbf78u, call_10},
-        {"SByte3_SetClamped_002cbfa8", 0x2cbfa8u, call_11},
-        {"SmallAlloc_FreeToBin_00101d08", 0x101d08u, call_12},
-        {"Stack_PeekFromTop_00234c20", 0x234c20u, call_13},
-        {"TwoSlot_Value_00258268", 0x258268u, call_14},
-        {"TypeTag_IsFlaggedType11_00232da8", 0x232da8u, call_15},
-        {"TypeTag_IsFlaggedType23_00232df8", 0x232df8u, call_16},
-        {"TypeTag_IsFlaggedType24_00232dd0", 0x232dd0u, call_17},
-        {"bstring2_AddRef_002c9148", 0x2c9148u, call_18},
-        {"bstring2_InitEmpty_002c9dd8", 0x2c9dd8u, call_19},
-        {"bstring_AddRef_002c85c8", 0x2c85c8u, call_20},
-        {"bstring_Data_002c8538", 0x2c8538u, call_21},
-        {"bstring_InitEmpty_002c8a68", 0x2c8a68u, call_22},
-        {"bstring_NarrowFromWide16_002c8418", 0x2c8418u, call_23},
-        {"bstring_RefCount_002c9078", 0x2c9078u, call_24},
-        {"bstring_Wide16FromWide32_002c8f68", 0x2c8f68u, call_25},
-        {"bstring_WideFromNarrow_002c8fa0", 0x2c8fa0u, call_26},
+        {"BitArray_Read_002ac6b8", 0x2ac6b8u, call_0, 0, false},
+        {"Field584_PositiveElse5BC_0015c9b8", 0x15c9b8u, call_1, 1, false},
+        {"Flags38_SetBit28_00187390", 0x187390u, call_2, 2, false},
+        {"Flags_HasAll_00345150", 0x345150u, call_3, 3, false},
+        {"GlobalTable_EntryFieldC_00258248", 0x258248u, call_4, 4, false},
+        {"Mem_Copy_00268588", 0x268588u, call_5, 5, false},
+        {"Mode_TryEnter_002157c0", 0x2157c0u, call_6, 6, false},
+        {"RegisteredObject_Construct_002cb4d8", 0x2cb4d8u, call_7, 7, false},
+        {"SByte3_Copy_002cbf58", 0x2cbf58u, call_8, 8, false},
+        {"SByte3_Copy_002cc050", 0x2cc050u, call_9, 9, false},
+        {"SByte3_FromFixed4_002cbf78", 0x2cbf78u, call_10, 10, false},
+        {"SByte3_SetClamped_002cbfa8", 0x2cbfa8u, call_11, 11, false},
+        {"SmallAlloc_FreeToBin_00101d08", 0x101d08u, call_12, 12, false},
+        {"Stack_PeekFromTop_00234c20", 0x234c20u, call_13, 13, false},
+        {"TwoSlot_Value_00258268", 0x258268u, call_14, 14, false},
+        {"TypeTag_IsFlaggedType11_00232da8", 0x232da8u, call_15, 15, false},
+        {"TypeTag_IsFlaggedType23_00232df8", 0x232df8u, call_16, 16, false},
+        {"TypeTag_IsFlaggedType24_00232dd0", 0x232dd0u, call_17, 17, false},
+        {"bstring2_AddRef_002c9148", 0x2c9148u, call_18, 18, false},
+        {"bstring2_InitEmpty_002c9dd8", 0x2c9dd8u, call_19, 19, false},
+        {"bstring_AddRef_002c85c8", 0x2c85c8u, call_20, 20, false},
+        {"bstring_Data_002c8538", 0x2c8538u, call_21, 21, false},
+        {"bstring_InitEmpty_002c8a68", 0x2c8a68u, call_22, 22, false},
+        {"bstring_NarrowFromWide16_002c8418", 0x2c8418u, call_23, 23, false},
+        {"bstring_RefCount_002c9078", 0x2c9078u, call_24, 24, false},
+        {"bstring_Wide16FromWide32_002c8f68", 0x2c8f68u, call_25, 25, false},
+        {"bstring_WideFromNarrow_002c8fa0", 0x2c8fa0u, call_26, 26, false},
     };
 }
 
@@ -304,13 +306,14 @@ void registerTheseusOverrides(PS2Runtime &runtime)
     }
     for (const Override &o : kOverrides)
         runtime.registerFunction(o.address, o.fn);
-    std::printf("[theseus] %zu rewrites active (SIMS_THESEUS=0 to disable)\n",
-                sizeof(kOverrides) / sizeof(kOverrides[0]));
+    std::printf("[theseus] %zu rewrites active at %zu addresses (SIMS_THESEUS=0 to disable)\n",
+                sizeof(g_calls) / sizeof(g_calls[0]), sizeof(kOverrides) / sizeof(kOverrides[0]));
 }
 
 void printTheseusStats()
 {
-    for (size_t i = 0; i < sizeof(kOverrides) / sizeof(kOverrides[0]); ++i)
-        std::printf("[theseus] %-40s 0x%06x calls=%llu\n", kOverrides[i].name, kOverrides[i].address,
-                    static_cast<unsigned long long>(g_calls[i].load(std::memory_order_relaxed)));
+    for (const Override &o : kOverrides)
+        if (!o.copy)  // counts include calls through identical copies
+            std::printf("[theseus] %-40s 0x%06x calls=%llu\n", o.name, o.address,
+                        static_cast<unsigned long long>(g_calls[o.counter].load(std::memory_order_relaxed)));
 }

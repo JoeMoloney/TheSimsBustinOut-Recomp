@@ -62,9 +62,11 @@ How a function gets replaced (all from the repo root, design ported from the Fab
 | Step | Command | What it does |
 |---|---|---|
 | Inventory | `python3 tools/theseus/inventory.py --pilot` | Every recompiled function: size, calls, loops, FPU/MMI use, source-file evidence |
-| Diff test | `python3 tools/theseus/difftest.py <rewrite>` | Original and rewrite on 200,000 random CPU states and memory; return value, saved registers, memory and hardware traffic must match |
+| Queue | `python3 tools/theseus/batch_pool.py --top 50 A B` | Ranks the functions not yet rewritten; byte-identical copies are one entry (one rewrite serves all, via `// theseus: copies`) |
+| Packet | `python3 tools/theseus/batch_packet.py --next 25 A` | Per function: disassembly, how callers set the arguments, and drafted input rules |
+| Diff test | `python3 tools/theseus/difftest.py <rewrite>` | Original and rewrite on 200,000 random CPU states and memory; return value, saved registers, memory and hardware traffic must match, and every branch of the original must go both ways |
 | Caller check | `python3 tools/theseus/caller_usage.py <rewrite>` | Follows every caller after the call: no one may read a scratch register the rewrite leaves different |
-| Gate | `python3 tools/theseus/gate.py <rewrite>...` | Both of the above, plus mutants of the rewrite that must all be caught; writes the ledger |
+| Gate | `python3 tools/theseus/gate.py <rewrite>...` | Diff test (with branch coverage) and caller check, plus mutants of the rewrite that must all be caught; writes the ledger |
 | Ship | `python3 tools/theseus/ship.py`, rebuild | The game registers each gated rewrite at its function's address (`SIMS_THESEUS=0` runs the originals) |
 
 ## Building

@@ -16,9 +16,12 @@ originals instead (A/B without a rebuild). Call counts are printed when the game
 Rebuild afterwards: cmake --build build/probe --target sims_boot_probe
 """
 import csv
+import json
 import os
 import re
 import sys
+
+import elfscan
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
@@ -43,9 +46,11 @@ namespace
         const char *name;
         uint32_t address;
         PS2Runtime::RecompiledFunction fn;
+        unsigned counter;  // index into g_calls (identical copies share their rewrite's counter)
+        bool copy;
     }};
 
-    std::atomic<uint64_t> g_calls[{count}];
+    std::atomic<uint64_t> g_calls[{count}];  // one per rewrite
 
 {wrappers}
 
@@ -64,15 +69,16 @@ void registerTheseusOverrides(PS2Runtime &runtime)
     }}
     for (const Override &o : kOverrides)
         runtime.registerFunction(o.address, o.fn);
-    std::printf("[theseus] %zu rewrites active (SIMS_THESEUS=0 to disable)\\n",
-                sizeof(kOverrides) / sizeof(kOverrides[0]));
+    std::printf("[theseus] %zu rewrites active at %zu addresses (SIMS_THESEUS=0 to disable)\\n",
+                sizeof(g_calls) / sizeof(g_calls[0]), sizeof(kOverrides) / sizeof(kOverrides[0]));
 }}
 
 void printTheseusStats()
 {{
-    for (size_t i = 0; i < sizeof(kOverrides) / sizeof(kOverrides[0]); ++i)
-        std::printf("[theseus] %-40s 0x%06x calls=%llu\\n", kOverrides[i].name, kOverrides[i].address,
-                    static_cast<unsigned long long>(g_calls[i].load(std::memory_order_relaxed)));
+    for (const Override &o : kOverrides)
+        if (!o.copy)  // counts include calls through identical copies
+            std::printf("[theseus] %-40s 0x%06x calls=%llu\\n", o.name, o.address,
+                        static_cast<unsigned long long>(g_calls[o.counter].load(std::memory_order_relaxed)));
 }}
 """
 
@@ -100,7 +106,10 @@ def main():
         return
     ship = [r for r in rows if r["status"] in ("gated", "shipped") and r["gate"].startswith("PASS")]
     ship.sort(key=lambda r: r["name"])
+    insns = {int(f["start"], 16): f["insns"] for f in map(json.loads, open(os.path.join(REPO, "out/theseus/functions.jsonl")))}
+    seg = elfscan.segment()
     includes, wrappers, table = [], [], []
+    n_copies = 0
     for i, r in enumerate(ship):
         name = r["name"]
         with open(os.path.join(HERE, "rewrites", name + ".cpp")) as src:
@@ -113,13 +122,19 @@ def main():
                         f"    {{\n        g_calls[{i}].fetch_add(1, std::memory_order_relaxed);\n" +
                         (f"        ps2x::native::runOnFiber(*runtime, rw{i}::{name}, rdram, ctx);  // calls guest code\n    }}"
                          if calls_out else f"        rw{i}::{name}(rdram, ctx, runtime);\n    }}"))
-        table.append(f'        {{"{name}", 0x{addr:06x}u, call_{i}}},')
+        table.append(f'        {{"{name}", 0x{addr:06x}u, call_{i}, {i}, false}},')
+        for c in elfscan.rewrite_copies(name):
+            # Same rewrite at an identical copy: refuse if the bytes differ (a wrong copies line).
+            if insns.get(c) != insns[addr] or elfscan.body(seg, c, insns[addr]) != elfscan.body(seg, addr, insns[addr]):
+                sys.exit(f"ship.py: {name}: copy 0x{c:06x} is not byte-identical to 0x{addr:06x}")
+            table.append(f'        {{"{name}", 0x{c:06x}u, call_{i}, {i}, true}},')
+            n_copies += 1
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     text = TEMPLATE.format(includes="\n".join(includes), count=max(1, len(ship)),
                            wrappers="\n".join(wrappers), table="\n".join(table))
     with open(OUT, "w") as f:
         f.write(text)
-    print(f"{len(ship)} rewrites -> {os.path.relpath(OUT, REPO)}")
+    print(f"{len(ship)} rewrites (+{n_copies} identical copies) -> {os.path.relpath(OUT, REPO)}")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,9 @@ Usage (from the repo root):
     python3 tools/theseus/gate.py <rewrite>... [-j N] [--batch NAME] [--no-ledger]
 
 Per rewrite (tools/theseus/rewrites/<rewrite>.cpp):
-  1. difftest.py at 200,000 cases: PASS-ABI or PASS-STRICT.
+  1. difftest.py at 200,000 cases: PASS-ABI or PASS-STRICT, and every conditional branch of the
+     original went both ways (coverage; a direction no valid input reaches is listed in the
+     .rules file as `uncovered 0xADDR taken|not <reason>`).
   2. caller_usage.py: no caller reads a scratch register the rewrite leaves different.
   3. Rewrite mutants: small changes to the rewrite (an integer literal +1, a comparison flipped,
      a read/write width changed, a store dropped). Each must FAIL a 20,000-case diff test,
@@ -108,6 +110,9 @@ def gate(name, batch):
     rec["difftest_ok"] = code == 0
     if not rec["difftest_ok"]:
         rec["detail"] = text[-2000:]
+    rec["coverage_gaps"] = re.findall(r"^  coverage gap: (.+)$", text, re.M)
+    cov = re.search(r"^COVERAGE \S+ \((\S+) branch", text, re.M)
+    rec["coverage"] = cov.group(1) if cov else "?"
 
     code, text = run([sys.executable, os.path.join(HERE, "caller_usage.py"), name])
     rec["callers_ok"] = code == 0
@@ -135,7 +140,7 @@ def gate(name, batch):
     rec["survivors"] = survivors
     rec["not_compiling"] = errors
     rec["kill_rate"] = round(killed / total, 3) if total else None
-    rec["passed"] = rec["difftest_ok"] and rec["callers_ok"] and not survivors
+    rec["passed"] = rec["difftest_ok"] and rec["callers_ok"] and not survivors and not rec["coverage_gaps"]
     with open(os.path.join(out, "gate.json"), "w") as f:
         json.dump(rec, f, indent=2)
     rec["batch"] = batch
@@ -159,7 +164,8 @@ def update_ledger(recs):
         row["gate"] = rec["difftest"]
         row["kill_rate"] = "" if rec["kill_rate"] is None else f"{rec['kill_rate']:.3f}"
         row["note"] = (f"gate.py {rec['date']}: {rec['difftest']}; mutants {rec['killed']}/{rec['mutants']}; "
-                       f"callers {'ok' if rec['callers_ok'] else 'READ'} ({rec['call_sites']} sites)")
+                       f"callers {'ok' if rec['callers_ok'] else 'READ'} ({rec['call_sites']} sites); "
+                       f"branches {rec['coverage']}")
     with open(LEDGER, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS, delimiter="\t", lineterminator="\n")
         w.writeheader()
@@ -179,7 +185,8 @@ def main():
     for r in recs:
         mark = "PASS" if r["passed"] else "FAIL"
         print(f"{mark}  {r['name']:38s} {r['difftest']:12s} callers {'ok' if r['callers_ok'] else 'READ':4s} "
-              f"({r['call_sites']} sites)  mutants {r['killed']}/{r['mutants']}"
+              f"({r['call_sites']} sites)  mutants {r['killed']}/{r['mutants']}  branches {r['coverage']}"
+              + "".join(f"\n        coverage gap {g}" for g in r["coverage_gaps"])
               + "".join(f"\n        survivor {s}" for s in r["survivors"])
               + "".join(f"\n        not compiling {s}" for s in r["not_compiling"]))
     if not a.no_ledger:

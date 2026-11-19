@@ -306,9 +306,15 @@ def main():
     m = re.search(r"([0-9a-fA-F]{6,8})$", name)
     target = int(m.group(1), 16)
     regs = sys.argv[2:] or scratch_from_result(name)
-    sites, jumps = call_sites(target)
-    taken = address_taken(target)
-    print(f"0x{target:06x}: {len(sites)} call sites (jal), {len(jumps)} tail jumps (j); checking {', '.join(regs) or 'nothing'}")
+    copies = elfscan.rewrite_copies(name)  # identical copies share the rewrite: check their callers too
+    sites, jumps, taken = [], [], []
+    for t in [target] + copies:
+        s, j = call_sites(t)
+        sites += s
+        jumps += j
+        taken += address_taken(t)
+    print(f"0x{target:06x}" + (f" + {len(copies)} copies" if copies else "")
+          + f": {len(sites)} call sites (jal), {len(jumps)} tail jumps (j); checking {', '.join(regs) or 'nothing'}")
     bad = 0
     for reg in regs:
         n = NAMES.index(reg)

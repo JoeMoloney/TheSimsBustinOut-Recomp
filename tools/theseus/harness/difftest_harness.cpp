@@ -220,6 +220,24 @@ namespace
     }
 
     alignas(64) unsigned char g_runtime_storage[sizeof(PS2Runtime)];
+
+    // Branch coverage of the original (difftest.py instruments it: theseus_cov after every
+    // conditional branch decision). Small open-addressing table keyed by branch address.
+    struct CovEntry { uint32_t addr; long taken, not_taken; };
+    CovEntry g_cov[1024];
+    bool g_cov_on = false;  // only while the original runs
+}
+
+void theseus_cov(uint32_t branch, bool taken)
+{
+    if (!g_cov_on) return;
+    for (uint32_t i = (branch >> 2) & 1023;; i = (i + 1) & 1023)
+        if (g_cov[i].addr == branch || g_cov[i].addr == 0)
+        {
+            g_cov[i].addr = branch;
+            ++(taken ? g_cov[i].taken : g_cov[i].not_taken);
+            return;
+        }
 }
 
 int main(int argc, char **argv)
@@ -311,7 +329,9 @@ int main(int argc, char **argv)
 
         R5900Context a = init, b = init;
         theseus_stub::g_events = {};
+        g_cov_on = true;
         theseus_original(mem_a, &a, runtime);
+        g_cov_on = false;
         const theseus_stub::Events ev_a = theseus_stub::g_events;
         theseus_stub::g_events = {};
         theseus_rewrite(mem_b, &b, runtime);
@@ -402,6 +422,8 @@ int main(int argc, char **argv)
     if (first_stray_scan >= 0) std::printf(" first_at_page=0x%08x by_case<=%ld", first_stray_page, first_stray_scan);
     std::printf(" (all RAM compared every %ld cases)\n", kScanEvery);
     std::printf("rules=%s\n", (sizeof(kRules) / sizeof(kRules[0]) > 1 || kRules[0].reg || kMemRules[0].addr || kMemRules[0].base || kDataRules[0].addr) ? "yes" : "none");
+    for (const CovEntry &e : g_cov)  // branches never executed at all are listed by difftest.py
+        if (e.addr) std::printf("branch 0x%06x taken=%ld not_taken=%ld\n", e.addr, e.taken, e.not_taken);
     const bool fail = abi_bad || stray_pages;
     std::printf("RESULT %s\n", fail ? "FAIL" : (strict_bad ? "PASS-ABI" : "PASS-STRICT"));
     return fail ? 1 : 0;
