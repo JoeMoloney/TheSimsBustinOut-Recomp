@@ -3,9 +3,9 @@
 
 Usage (from the repo root):
     python3 tools/theseus/ship.py            # regenerate tools/theseus/shipped/theseus_overrides.cpp
-    python3 tools/theseus/ship.py --confirm [NAME ...]
+    python3 tools/theseus/ship.py --confirm NAME ... | --all
                                              # after the in-game check: ledger rows gated -> shipped
-                                             # (only the named ones, e.g. those with calls > 0)
+                                             # (the named ones, e.g. those with calls > 0)
 
 The generated file #includes every rewrite whose ledger row is `gated` or `shipped` (so the
 game runs exactly the code the gate tested) and defines registerTheseusOverrides(), which the
@@ -92,8 +92,12 @@ def read_ledger():
 def main():
     rows = read_ledger()
     if "--confirm" in sys.argv:
-        # --confirm [NAME ...]: only the named rows (those the in-game run exercised); no names = all
-        names = set(sys.argv[sys.argv.index("--confirm") + 1:])
+        # --confirm NAME ...: only the named rows (those the in-game run exercised). An empty list
+        # confirms nothing (a log without stats lines once confirmed every gated row); --all is
+        # needed to confirm every gated row.
+        names = set(a for a in sys.argv[sys.argv.index("--confirm") + 1:] if a != "--all")
+        if not names and "--all" not in sys.argv:
+            sys.exit("ship.py --confirm: no names given (use --all to confirm every gated row)")
         n = 0
         for r in rows:
             if r["status"] == "gated" and (not names or r["name"] in names):
