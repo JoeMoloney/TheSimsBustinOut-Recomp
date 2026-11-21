@@ -1,13 +1,13 @@
 # Sims Bustin' Out Recomp — Handoff
 
-Last updated: 2026-11-20
+Last updated: 2026-11-21
 
 ## November 20 (late): THESEUS BATCH 11 — first 30 of tier B (stores), all gated
 
 - **Batch 11 = tier B ranks 1-30** (functions that store): string/tree-header/struct initialisers (`Str_InitStatic3A8AD0` 61 call sites, `Zero12` with 13 identical copies, `Struct1A_Init`, `Object24_Init`, `Pool_Init`), field setters, a word copy (`Words_Copy`, 4 copies), a 16-bit `wcscpy`, the game's **`rand()`** (0x343388: LCG seed 0x3F9184, `* 0x41C64E6D + 0x3039`, result built from 16-bit partial products), a **`std::map<u16, T>::find`** (0x33b1c8; header at [a0+4], value +0x14, keys above 0xFFFA give 0) and the tree lookup **0x2b5230** deferred since batch 1 (`Tree18_FindValue1C`: also stores the value to *a2).
 - **Gate:** 23/30 first time; survivors were equivalents (narrower reads into narrower types, byte stores widened where the next byte is overwritten later) and rules gaps (map keys 0xFFFA/0xFFFB/>0xFF; the LCG carry case needs `lo * 0x4E6D + 0x3039 = 0x...FFFF`, i.e. seed low half 0xBB1E). `Words_Copy` is now a do/while like the original (a count whose low 32 bits are 0 copies 2^32 words in both). Rules pitfalls: the harness `tree N` never has an empty map or a missing key between keys (hand-built maps added); a copy whose destination can follow its source chases its own output forever (destination in the upper window half). 30/30.
 - **Ship + 300 s headless (scripted pad):** 340 rewrites at 369 addresses, no errors, 24 of 30 called (`Tree18_FindValue1C` 99k, `Field70_PushWord` 17k, `Str_InitStatic3A8AD0` 4.2k). Not confirmed yet.
-- **User's visible session (Nov 21, 00:03, `work/theseus-runs/play_0003.log`):** runs, looks the same as before, no errors in the log — but **closing the window kills the process**: the log stops mid-run with no `[probe] runtime returned` and no `[theseus]` call counts (Ctrl+C does the same). So play sessions cannot report calls yet. **First thing next session:** make window close end the run loop normally (so `printTheseusStats()` runs), or print the stats from a close/SIGINT handler. Until then, confirm from the scripted headless runs: 66 of the new rewrites showed calls (42 in `batch6-10_2224.log`, 24 in `batch11_2321.log`); all 202 rows are still `gated`.
+- **User's visible session (Nov 21, 00:03-00:11, `work/theseus-runs/play_0003.log`):** runs, looks the same as before, no errors. Closing the window ends the run normally: the log has `[run] window close requested`, `[run] exiting loop` and all 340 `[theseus]` call counts (an earlier note said the window close killed the process; the log had only been read while the game was still running). **Confirmed (Nov 21):** 104 of the 202 gated rows were called in this session -> `ship.py --confirm` with those names: **242 shipped, 98 gated** (not called in a visible session yet). Cosmetic: `[run] window close requested` has no newline, so `Game thread returned` is glued to it.
 
 ## November 20 (evening): THESEUS BATCHES 6-10 — tier A done, 145 rewrites gated (172 gated in all)
 
