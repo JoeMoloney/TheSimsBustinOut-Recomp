@@ -1,0 +1,10 @@
+a0 oneof 0 1 2 3 0xffffffff 0x80000000 0x7fffffff
+mem32 0x3fa5d0 fixed 0x01008000
+mem32 0x01008000 oneof 0 0x01008110
+mem32 0x0100810c oneof 0 1 2 3 4 0xffffffff
+mem32 0x01008110 fixed 0x01009000
+mem32 0x01008114 fixed 0x01009010
+mem32 0x01008118 fixed 0x01009020
+mem32 0x0 fixed 0x01009100    # RAM 0 and the word below 32 MiB, read only by mutants that misread a null array
+mem32 0x01009100 fixed 0x5a5a
+mem32 0x1fffffc fixed 5

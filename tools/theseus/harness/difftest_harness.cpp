@@ -22,7 +22,7 @@
 //
 // Input rules (optional, tools/theseus/rewrites/<name>.rules, turned into difftest_rules.inc by
 // difftest.py) fix what an argument register holds. Registers: a0..a7 ($4..$11) or rN.
-//   a0 ptr | ptr_or_null | int | u32 | any | len N | slen N | fixed V | oneof V1 .. V16
+//   a0 ptr | ptr_or_null | int | u32 | any | len N | slen N | fixed V | oneof V1 .. V64
 //                                    (int/u32: a quarter of the time an edge value such as
 //                                    0xFFFF, 0x10000, 0x7FFFFFFF or 0xFFFFFFFF)
 //   a0 aptr | alen N                 pointer / length aligned to 8 half the time, to 4 a quarter
@@ -37,6 +37,8 @@
 //   mem32 *0x456500+12 len 4         a field of the struct a global points to
 //   data 0x3e69a8 41424300           fixed bytes before each case
 //   tree N | a0 tree_node | mem32 @a0+8 vec N   containers: see "containers" below
+//   ret64                            the function returns 64 bits (a double or long long in v0):
+//                                    v0's upper 32 bits become part of the ABI compare
 //   a0 double                        a 64-bit IEEE double: half the time an edge value
 //                                    (+-0, +-inf, NaNs, denormals, ...), else random bits
 #include "ps2_runtime_macros.h"
@@ -74,8 +76,8 @@ namespace
                 kSStr8, kSStr16, kSStr32,   // kSStr*: strings over a 2-letter alphabet
                 kTreeNode, kVec,            // see "containers" below
                 kDouble };                  // IEEE double bit patterns, half of them edge values
-    struct ArgRule { int reg; Kind kind; uint32_t max; uint32_t alts[16]; uint32_t n_alts; };
-    struct MemRule { uint32_t addr; Kind kind; uint32_t max; int base; uint32_t deref; uint32_t alts[16]; uint32_t n_alts; };
+    struct ArgRule { int reg; Kind kind; uint32_t max; uint32_t alts[64]; uint32_t n_alts; };
+    struct MemRule { uint32_t addr; Kind kind; uint32_t max; int base; uint32_t deref; uint32_t alts[64]; uint32_t n_alts; };
     struct DataRule { uint32_t addr; const char *hex; };
 #ifdef HAS_RULES
 #include "difftest_rules.inc"
@@ -85,6 +87,7 @@ namespace
     const DataRule kDataRules[] = {{0u, ""}};
     constexpr size_t kMemRuleCount = 0, kDataRuleCount = 0;
     constexpr uint32_t kTreeMax = 0;
+    constexpr bool kRet64 = false;
 #endif
 
     // ---- containers (GCC 2.95 / SGI STL), built in the upper half of the window, which
@@ -477,7 +480,7 @@ int main(int argc, char **argv)
                 if (f.abi) abi_fields_same = false;
             }
         }
-        const bool abi_ok = memory_same && v0_same && abi_fields_same && events_same;
+        const bool abi_ok = memory_same && v0_same && (!kRet64 || v0_high_same) && abi_fields_same && events_same;
         const bool strict_ok = abi_ok && v0_high_same && frame_same && std::memcmp(&a, &b, sizeof(a)) == 0;
         strict_bad += !strict_ok;
         abi_bad += !abi_ok;

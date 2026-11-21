@@ -1,0 +1,4 @@
+a0 oneof 0 1 2 3 0xffffffff
+mem32 0x3f8458 oneof 1 2 0xffffffff
+mem32 0x3f845c oneof 1 2 3
+mem32 0x3f8460 oneof 0 1 2 3   # the word after the pair (read only by a mutant)

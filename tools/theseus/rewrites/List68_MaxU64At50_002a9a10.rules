@@ -1,0 +1,10 @@
+mem32 0x3f82ec oneof 0 0x01008000
+mem32 0x01008068 oneof 0 0x01008100
+mem32 0x01008168 oneof 0 0x01008200
+mem32 0x01008268 fixed 0
+mem32 0x01008054 oneof 0 1 0x80000000 0xffffffff
+mem32 0x01008154 oneof 0 1 0x80000000
+mem32 0x01008254 oneof 0 2 0xffffffff
+uncovered 0x2a9a50 taken  after the jr $ra at 0x2a9a3c: another function the map joined
+uncovered 0x2a9a50 not    same
+ret64

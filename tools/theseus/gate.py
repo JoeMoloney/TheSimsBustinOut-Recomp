@@ -12,8 +12,8 @@ Per rewrite (tools/theseus/rewrites/<rewrite>.cpp):
   3. Rewrite mutants: small changes to the rewrite (an integer literal +1, a comparison flipped,
      a read/write width changed, a store dropped). Each must FAIL a 20,000-case diff test,
      which shows the random inputs reach every line. A survivor fails the gate; if the change
-     really is equivalent, mark the line `// gate: equivalent <token>: <reason>` (skips only the
-     mutants whose replacement contains <token>, e.g. read16).
+     really is equivalent, mark the line `// gate: equivalent <token>[,<token>...]: <reason>` (skips
+     only the mutants whose replacement contains one of the tokens, e.g. read16 or <=,17).
 Then a row in tools/theseus/batch/ledger.tsv (same columns as Fable II's ledger): status
 `gated` or `gate-fail` (rows already `reviewed`, `shipped` or `rejected` keep their status).
 Writes out/theseus/gate/<rewrite>/gate.json.
@@ -87,12 +87,14 @@ def mutants(path):
             result.append((i + 1, f"{m.group(1)} -> {lit}", new + ("//" + comment if comment else "")))
         if re.search(r"\bg\.write(8|16|32)\(", code):
             result.append((i + 1, "drop store", "// (dropped) " + line.strip()))
-    # `// gate: equivalent <token>: <reason>` skips the mutants on that line whose replacement
-    # contains <token> (e.g. read16); a bare `// gate: equivalent` skips the whole line.
+    # `// gate: equivalent <token>[,<token>...]: <reason>` skips the mutants on that line whose
+    # replacement contains one of the tokens (e.g. read16, or <=,17 for `< 16` when bit 16 can't
+    # be set); a bare `// gate: equivalent` skips the whole line.
     kept = []
     for lineno, what, new in result:
         marker = re.search(r"gate: equivalent(?: (\S+?):?(?:\s|$))?", src[lineno - 1])
-        if marker and (marker.group(1) is None or marker.group(1) in what.split("->")[-1]):
+        if marker and (marker.group(1) is None or
+                       any(token in what.split("->")[-1] for token in marker.group(1).split(","))):
             continue
         kept.append((lineno, what, new))
     texts = []

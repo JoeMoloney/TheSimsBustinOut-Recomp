@@ -64,8 +64,8 @@ def kind_and_value(words, where):
         die(f"{where}: expected one of {', '.join(KINDS)}")
     kind, rest = words[0], words[1:]
     if kind == "oneof":
-        if not 1 <= len(rest) <= 16:
-            die(f"{where}: oneof takes 1..16 values")
+        if not 1 <= len(rest) <= 64:
+            die(f"{where}: oneof takes 1..64 values")
         return KINDS[kind], 0, [int(v, 0) for v in rest]
     needs_value = kind in ("len", "slen", "fixed", "str", "wstr16", "wstr32", "alen", "sstr", "swstr16", "swstr32", "vec")
     if needs_value != bool(rest):
@@ -75,7 +75,7 @@ def kind_and_value(words, where):
 
 def rules_inc(path):
     """Turn a .rules file into the C++ tables the harness includes."""
-    args, mems, datas, tree = [], [], [], 0
+    args, mems, datas, tree, ret64 = [], [], [], 0, False
     for n, line in enumerate(open(path), 1):
         words = line.split("#", 1)[0].split()
         if not words:
@@ -83,6 +83,9 @@ def rules_inc(path):
         where = f"{os.path.basename(path)}:{n}"
         if words[0] == "uncovered":
             continue  # read by uncovered_allowed()
+        if words[0] == "ret64":  # the function returns 64 bits (double, long long): v0's upper half is ABI
+            ret64 = True
+            continue
         if words[0] == "tree":
             if len(words) != 2:
                 die(f"{where}: tree <max nodes>")
@@ -121,7 +124,8 @@ def rules_inc(path):
     out += ["};", "const DataRule kDataRules[] = {"]
     out += [f'    {{0x{a:x}u, "{h}"}},' for a, h in datas] or ['    {0u, ""},']
     out += ["};", f"constexpr size_t kMemRuleCount = {len(mems)}, kDataRuleCount = {len(datas)};",
-            f"constexpr uint32_t kTreeMax = {tree};"]
+            f"constexpr uint32_t kTreeMax = {tree};",
+            f"constexpr bool kRet64 = {'true' if ret64 else 'false'};"]
     return "\n".join(out) + "\n"
 
 

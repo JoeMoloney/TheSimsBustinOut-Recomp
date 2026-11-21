@@ -1,0 +1,7 @@
+a0 fixed 0x01004000   # fixed: a random pointer near 0x01008000 could overlap the fixed structures there
+a1 oneof 0 1 2 3 4 0xffffffff 0x80000000 0x7fffffff
+mem32 @a0+0x0 oneof 0 0x01008000        # head: empty or up to 3 nodes
+mem32 0x01008008 oneof 0 0x01008100
+mem32 0x01008108 oneof 0 0x01008200
+mem32 0x01008208 fixed 0
+mem32 0x0 fixed 0x12345       # read only by a mutant that walks a null head

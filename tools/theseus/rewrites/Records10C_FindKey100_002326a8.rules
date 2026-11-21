@@ -1,0 +1,6 @@
+a0 fixed 0x01004000
+a1 oneof 0 1 2 0x10001 0xffffffff
+mem32 0x01004000 oneof 0 1 2 3 0xffffffff
+mem32 0x01004104 oneof 0 1 2 0x10001
+mem32 0x01004210 oneof 0 1 2 0x10001
+mem32 0x0100431c oneof 0 1 2 0x10001

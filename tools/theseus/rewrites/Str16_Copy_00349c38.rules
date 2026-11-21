@@ -1,0 +1,2 @@
+a0 fixed 0x0100d000   # upper window half: a destination just after the source would chase its own copy forever
+a1 wstr16 32

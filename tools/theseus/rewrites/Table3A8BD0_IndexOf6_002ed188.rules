@@ -1,0 +1,7 @@
+a0 oneof 0 1 2 3 0xffffffff 0x10001
+mem32 0x3a8bd0 oneof 0 1 2 3 0xffffffff
+mem32 0x3a8bd4 oneof 0 1 2 3 0xffffffff
+mem32 0x3a8bd8 oneof 0 1 2 3 0xffffffff
+mem32 0x3a8bdc oneof 0 1 2 3 0xffffffff
+mem32 0x3a8be0 oneof 0 1 2 3 0xffffffff
+mem32 0x3a8be4 oneof 0 1 2 3 0xffffffff

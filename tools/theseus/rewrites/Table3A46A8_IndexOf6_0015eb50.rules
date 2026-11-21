@@ -1,0 +1,8 @@
+a0 oneof 0 1 2 3 0xffffffff 0x10001
+mem32 0x3a46a8 oneof 0 1 2 3 0xffffffff
+mem32 0x3a46ac oneof 0 1 2 3 0xffffffff
+mem32 0x3a46b0 oneof 0 1 2 3 0xffffffff
+mem32 0x3a46b4 oneof 0 1 2 3 0xffffffff
+mem32 0x3a46b8 oneof 0 1 2 3 0xffffffff
+mem32 0x3a46bc oneof 0 1 2 3 0xffffffff
+mem32 0x3a46c0 oneof 0 1 2 3   # the word after the table (read only by a mutant)

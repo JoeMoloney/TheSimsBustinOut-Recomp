@@ -1,0 +1,2 @@
+a0 ptr
+mem32 @a0+0x38c oneof 0x30aa9779 0x30aa9778 0 0xb0aa9779

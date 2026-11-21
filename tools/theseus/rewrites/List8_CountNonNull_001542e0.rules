@@ -1,0 +1,8 @@
+a0 fixed 0x01004000   # fixed: a random pointer near 0x01008000 could overlap the fixed structures there
+mem32 @a0+0x14 oneof 0 0x01008000
+mem32 0x01008000 oneof 0 1 0xffffffff 0x10000
+mem32 0x01008008 oneof 0 0x01008100
+mem32 0x01008100 oneof 0 1 0x10000
+mem32 0x01008108 oneof 0 0x01008200
+mem32 0x01008200 oneof 0 5
+mem32 0x01008208 fixed 0

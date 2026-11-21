@@ -1,0 +1,20 @@
+a0 fixed 0x01006000
+a1 fixed 0x01004000
+mem32 0x0100600c fixed 0x01008000
+mem32 0x01006010 oneof 0x01008000 0x01008014 0x01008028 0x0100803c
+mem32 0x01004000 oneof 0 1 2 3 4 0xffffffff 0x80000000
+mem32 0x01004004 oneof 0 1 2 3 4 0xffffffff 0x80000000
+mem32 0x01004008 oneof 0 1 2 3 4 0xffffffff 0x80000000
+mem32 0x0100400c oneof 0 1 2 3 4 0xffffffff 0x80000000
+mem32 0x01008000 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008004 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008008 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x0100800c oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008014 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008018 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x0100801c oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008020 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008028 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x0100802c oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008030 oneof 0 1 2 3 4 0x7fffffff
+mem32 0x01008034 oneof 0 1 2 3 4 0x7fffffff
