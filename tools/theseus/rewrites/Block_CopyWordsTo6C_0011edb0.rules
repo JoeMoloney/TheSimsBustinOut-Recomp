@@ -1,0 +1,6 @@
+a0 ptr
+a1 ptr
+a2 len 3
+mem32 @a1+0x3c oneof 0 1 0x10000
+mem32 @a1+0x24 ptr
+uncovered 0x11edc4 taken  the count is 0x10 or 0x100 (movz), never 0

@@ -1,0 +1,50 @@
+# small repeated values so equal elements (and value == parent) occur
+a0 fixed 0x01001000
+mem32 0x1001000 oneof 1 2 3
+mem32 0x1001004 oneof 1 2 3
+mem32 0x1001008 oneof 1 2 3
+mem32 0x100100c oneof 1 2 3
+mem32 0x1001010 oneof 1 2 3
+mem32 0x1001014 oneof 1 2 3
+mem32 0x1001018 oneof 1 2 3
+mem32 0x100101c oneof 1 2 3
+mem32 0x1001020 oneof 1 2 3
+mem32 0x1001024 oneof 1 2 3
+mem32 0x1001028 oneof 1 2 3
+mem32 0x100102c oneof 1 2 3
+mem32 0x1001030 oneof 1 2 3
+mem32 0x1001034 oneof 1 2 3
+mem32 0x1001038 oneof 1 2 3
+mem32 0x100103c oneof 1 2 3
+mem32 0x1001040 oneof 1 2 3
+mem32 0x1001044 oneof 1 2 3
+mem32 0x1001048 oneof 1 2 3
+mem32 0x100104c oneof 1 2 3
+mem32 0x1001050 oneof 1 2 3
+mem32 0x1001054 oneof 1 2 3
+mem32 0x1001058 oneof 1 2 3
+mem32 0x100105c oneof 1 2 3
+mem32 0x1001060 oneof 1 2 3
+mem32 0x1001064 oneof 1 2 3
+mem32 0x1001068 oneof 1 2 3
+mem32 0x100106c oneof 1 2 3
+mem32 0x1001070 oneof 1 2 3
+mem32 0x1001074 oneof 1 2 3
+mem32 0x1001078 oneof 1 2 3
+mem32 0x100107c oneof 1 2 3
+mem32 0x1001080 oneof 1 2 3
+mem32 0x1001084 oneof 1 2 3
+mem32 0x1001088 oneof 1 2 3
+mem32 0x100108c oneof 1 2 3
+mem32 0x1001090 oneof 1 2 3
+mem32 0x1001094 oneof 1 2 3
+mem32 0x1001098 oneof 1 2 3
+mem32 0x100109c oneof 1 2 3
+mem32 0x10010a0 oneof 1 2 3
+mem32 0x10010a4 oneof 1 2 3
+mem32 0x10010a8 oneof 1 2 3
+mem32 0x10010ac oneof 1 2 3
+mem32 0x10010b0 oneof 1 2 3
+a1 len 20
+a2 len 40
+a3 oneof 0 1 2 3 4

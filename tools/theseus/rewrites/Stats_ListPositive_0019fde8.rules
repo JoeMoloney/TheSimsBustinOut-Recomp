@@ -1,0 +1,11 @@
+a0 ptr
+mem32 @a0+0x18d6 oneof 0xff 0 1 2 0xff
+mem32 @a0+0xa0 oneof 0 0x01008000 0x01008000
+mem32 @a0+0xa4 oneof 0 0x01008100 0x01008100
+mem32 @a0+0xa8 oneof 0 0x01008200 0x01008200
+mem32 0x01008018 fixed 0x01009000
+mem32 0x01008118 fixed 0x01009100
+mem32 0x01008218 fixed 0x01009200
+uncovered 0x19fe44 taken  2nd stat: at most 1 listed before it, so fewer than 4
+uncovered 0x19fe74 taken  3rd stat: at most 2 listed before it
+uncovered 0x19fea4 taken  4th stat: at most 3 listed before it

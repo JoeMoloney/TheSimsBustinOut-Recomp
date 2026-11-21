@@ -1,0 +1,5 @@
+a0 fixed 0x01009000
+mem32 0x01009008 ptr
+mem32 0x01009018 u32
+a1 ptr
+a2 len 40

@@ -1,0 +1,4 @@
+a0 ptr
+a1 u32
+a2 oneof 0 1 0x80000000
+mem32 @a0+0x344 u32

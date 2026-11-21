@@ -1,0 +1,4 @@
+a0 ptr
+mem32 0x3f9044 u32
+mem32 0x3f9048 u32
+mem32 0x3f9078 u32

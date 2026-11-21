@@ -1,0 +1,10 @@
+# x 0x01028000, y 0x01018100, P (x's parent) 0x01008300: three different upper halves, so
+# 16-bit pointer stores show; y's inner child 0x01008200 or none; root pointer at 0x01008400
+a0 fixed 0x01028000
+a1 fixed 0x01008400
+mem32 0x01028008 fixed 0x01018100
+mem32 0x0101810c oneof 0 0x01008200
+mem32 0x01028004 fixed 0x01008300
+mem32 0x01008400 oneof 0x01028000 0x01008300
+mem32 0x01008308 oneof 0x01028000 0x01008500
+mem32 0x0100830c oneof 0x01028000 0x01008500

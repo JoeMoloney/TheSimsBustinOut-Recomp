@@ -1,0 +1,7 @@
+# element counts that end the original's walks (end - begin a multiple of the element size);
+# ends past 0x01010000 give the stored begin a different upper half than the old end
+a0 ptr
+mem32 @a0+0x24 fixed 0x0100ffec
+mem32 @a0+0x28 oneof 0x0100ffec 0x01010000 0x01010014 0x010100b4
+mem32 @a0+0x14 fixed 0x0100fff4
+mem32 @a0+0x18 oneof 0x0100fff4 0x01010000 0x0101000c 0x0101006c

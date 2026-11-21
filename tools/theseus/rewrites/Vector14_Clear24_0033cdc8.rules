@@ -1,0 +1,4 @@
+# end - begin a multiple of 0x14 so the original's walk ends; ends past 0x01010000
+a0 ptr
+mem32 @a0+0x24 fixed 0x0100ffec
+mem32 @a0+0x28 oneof 0x0100ffec 0x01010000 0x01010014 0x010100b4

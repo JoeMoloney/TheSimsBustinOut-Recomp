@@ -1,0 +1,4 @@
+mem32 0x3f7d78 oneof 0 0x01008000 0x01008000
+mem32 0x3f7d7c u32
+a0 ptr_or_null
+uncovered 0x172ce0 taken  the same a0 == 0 test already passed at 0x172ccc

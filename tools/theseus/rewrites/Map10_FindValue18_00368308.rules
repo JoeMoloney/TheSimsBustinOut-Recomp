@@ -1,0 +1,14 @@
+# a hand-built map (header 0x01008000; root key 10/20, left key 5, right key 30)
+a0 ptr
+mem32 @a0+0x4 fixed 0x01008000
+mem32 0x01008004 oneof 0 0x01008100 0x01008100
+mem32 0x01008108 oneof 0 0x01008200
+mem32 0x0100810c oneof 0 0x01008300
+mem32 0x01008110 oneof 10 20 0x10014
+mem32 0x01008208 fixed 0
+mem32 0x0100820c fixed 0
+mem32 0x01008210 fixed 5
+mem32 0x01008308 fixed 0
+mem32 0x0100830c fixed 0
+mem32 0x01008310 fixed 30
+a1 oneof 0 5 6 10 11 20 25 30 31 0xffffffff 0x10014 0x10013 0x10015 0x14

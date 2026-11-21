@@ -1,0 +1,3 @@
+a0 str 64
+a1 ptr
+a2 oneof 0 1 2 3 5 10 64 0xffffffff 0x80000001

@@ -1,0 +1,3 @@
+a0 ptr_or_null
+mem32 0x3f9248 fixed 0x01009000
+mem32 0x01009650 u32

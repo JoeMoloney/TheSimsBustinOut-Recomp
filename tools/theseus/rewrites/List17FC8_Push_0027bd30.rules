@@ -1,0 +1,3 @@
+a0 ptr
+a1 ptr
+mem32 @a0+0x17fc8 u32

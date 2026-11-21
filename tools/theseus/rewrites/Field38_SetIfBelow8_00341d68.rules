@@ -1,0 +1,2 @@
+a0 ptr
+a1 oneof 0 1 7 8 9 0xffffffff 0x10003

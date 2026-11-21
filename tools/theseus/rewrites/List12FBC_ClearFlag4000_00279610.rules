@@ -1,0 +1,5 @@
+a0 fixed 0x01001000
+mem32 0x010167bc oneof 0 1 2 3 0xffffffff
+mem32 0x01013fbc fixed 0x01008000
+mem32 0x01013fc0 fixed 0x01008100
+mem32 0x01013fc4 fixed 0x01008200

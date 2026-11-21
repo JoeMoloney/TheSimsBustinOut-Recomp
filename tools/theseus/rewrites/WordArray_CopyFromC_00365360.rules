@@ -1,0 +1,5 @@
+a0 ptr
+a1 ptr
+mem32 @a0+0x4 slen 20
+mem32 @a0+0xc ptr
+mem32 @a1+0xc ptr

@@ -1,0 +1,6 @@
+mem32 0x3f7d78 oneof 0 0x01008000 0x01008000
+mem32 0x01008000 oneof 0 0x01008100
+mem32 0x01008100 oneof 0 0x01008200
+mem32 0x3f7d7c u32
+uncovered 0x172c98 taken  the same item == 0 test already passed at 0x172c88
+mem32 0x0 fixed 0x01008200  # RAM 0: a pool test that let 0 through would read this

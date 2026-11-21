@@ -1,0 +1,6 @@
+a0 u32
+a1 u32
+mem32 0x3f80a0 u32
+mem32 0x3f80a4 u32
+mem32 0x3f80a8 u32
+mem32 0x3f80ac u32

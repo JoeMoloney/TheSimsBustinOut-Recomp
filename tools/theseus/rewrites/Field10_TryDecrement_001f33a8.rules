@@ -1,0 +1,2 @@
+a0 ptr
+mem32 @a0+0x10 oneof 0 1 2 0x10000 0xffffffff

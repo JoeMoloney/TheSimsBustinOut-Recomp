@@ -1,0 +1,2 @@
+a0 fixed 0x01009000
+mem32 @a0+0x0 str 64

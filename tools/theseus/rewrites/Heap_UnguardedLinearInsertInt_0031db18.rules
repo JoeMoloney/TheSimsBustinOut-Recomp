@@ -1,0 +1,4 @@
+# words at 0x01008000.., a sentinel INT_MIN just below so the walk ends
+a0 oneof 0x01008000 0x01008004 0x01008008 0x01008010 0x01008020
+mem32 0x01007ffc fixed 0x80000000
+a1 int

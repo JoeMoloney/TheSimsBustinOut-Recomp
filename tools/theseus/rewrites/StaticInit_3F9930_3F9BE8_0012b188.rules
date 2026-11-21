@@ -1,0 +1,11 @@
+a0 oneof 0 1 0x80000000
+a1 oneof 0xffff 0 0x1ffff 0xffffffff
+mem32 0x3f9930 u32
+mem32 0x3f9934 u32
+mem32 0x3f9938 u32
+mem32 0x3f993c u32
+mem32 0x3f9940 u32
+mem32 0x3f9944 u32
+mem32 0x3f9be8 u32
+mem32 0x3f9bec u32
+mem32 0x3f9bf0 u32

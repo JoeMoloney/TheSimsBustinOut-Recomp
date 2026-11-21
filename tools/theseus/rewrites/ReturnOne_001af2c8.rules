@@ -1,0 +1,10 @@
+a0 ptr
+a1 oneof 2 16 0x35 3
+uncovered 0x1af30c taken  after the jr $ra at 0x1af2c8: other functions the map joined
+uncovered 0x1af30c not    same
+uncovered 0x1af314 taken  same
+uncovered 0x1af314 not    same
+uncovered 0x1af31c taken  same
+uncovered 0x1af31c not    same
+uncovered 0x1af330 taken  same
+uncovered 0x1af330 not    same

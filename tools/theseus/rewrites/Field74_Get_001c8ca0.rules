@@ -1,0 +1,5 @@
+a0 ptr
+uncovered 0x1c8cb0 taken  after the jr $ra at 0x1c8ca0: another function the map joined
+uncovered 0x1c8cb0 not    same
+uncovered 0x1c8cb8 taken  same
+uncovered 0x1c8cb8 not    same
