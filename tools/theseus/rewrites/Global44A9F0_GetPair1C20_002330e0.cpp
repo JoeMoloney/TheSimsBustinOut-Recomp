@@ -16,11 +16,11 @@ void Global44A9F0_GetPair1C20_002330e0(uint8_t *rdram, R5900Context *ctx, PS2Run
     bool ok = false;
     if (rec != 0)
     {
-        const uint32_t flags = g.read32(rec);
+        const uint32_t flags = g.read32(rec);  // gate: equivalent read16: only the low 16 bits are used
         v0 = flags & 0x7FFF;
         if (v0 == 0x12)
         {
-            v0 = flags & 0x8000;
+            v0 = flags & 0x8000;  // gate: equivalent 0x8001: the low 15 bits are 0x12 here, so bit 0 is 0
             ok = v0 != 0;
         }
     }

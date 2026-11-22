@@ -9,7 +9,7 @@ void Array20_SetVtable3DC100_0026f1d0(uint8_t *rdram, R5900Context *ctx, PS2Runt
         g.ret_void();
         return;
     }
-    uint32_t p = g.arg(0), left = g.arg(1), last = 0;
+    uint32_t p = g.arg(0), left = g.arg(1), last = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     do
     {
         last = p;

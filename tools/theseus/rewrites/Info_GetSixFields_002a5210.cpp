@@ -7,7 +7,7 @@ void Info_GetSixFields_002a5210(uint8_t *rdram, R5900Context *ctx, PS2Runtime *r
     const uint32_t p = g.arg(0);
     g.write32(g.arg(3), g.read32(g.read32(p + 0x20) + 4) >> 13);
     g.write32(g.arg(5), 0);
-    if (g.read32(p + 8) & 1)
+    if (g.read32(p + 8) & 1)  // gate: equivalent read16: only bit 0 is used
         g.write32(g.arg(5), g.read32(g.read32(p + 0x24) + 4) >> 13);
     g.write32(g.arg(1), g.read32(p));
     g.write32(g.arg(2), g.read32(p + 4));

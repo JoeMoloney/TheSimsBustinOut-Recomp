@@ -5,7 +5,7 @@ void Words4_CopyFromTable40B3_001c2090(uint8_t *rdram, R5900Context *ctx, PS2Run
 {
     theseus::Guest g{rdram, ctx, runtime};
     const uint32_t src = g.arg64(1) != 0 ? 0x40B310 : 0x40B320, dst = g.arg(0) + 0x4C;
-    uint32_t w = 0;
+    uint32_t w = 0;  // gate: equivalent 1: overwritten in the loop
     for (uint32_t i = 0; i < 16; i += 4)
     {
         w = g.read32(src + i);

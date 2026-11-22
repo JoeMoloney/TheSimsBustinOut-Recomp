@@ -1,5 +1,5 @@
 a0 fixed 0x01009000
-mem32 0x01009008 ptr
+mem32 0x01009008 oneof 0x01004000 0x0100fff0 0x0101ffe8   # cursors that cross a 64 KB boundary
 mem32 0x01009018 u32
 a1 ptr
 a2 len 40

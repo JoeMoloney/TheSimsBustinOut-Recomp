@@ -11,7 +11,7 @@ void List_AppendValuesTo12FBC_00279218(uint8_t *rdram, R5900Context *ctx, PS2Run
         return;
     }
     const uint32_t base = g.arg(0) + 0x12FBC, count_at = g.arg(0) + 0x157BC;
-    uint32_t slot = 0;
+    uint32_t slot = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     do
     {
         slot = base + (g.read32(count_at) << 2);

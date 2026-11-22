@@ -10,7 +10,7 @@ void Slots114_Claim_00231f90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runt
     {
         if (g.read32(e) == 0)
         {
-            g.write32(e, 1);
+            g.write32(e, 1);  // gate: equivalent write16: the slot is 0 here, its upper half stays 0
             g.write32(base + 0x4500, g.read32(base + 0x4500) + 1);
             g.ret(e);
             return;

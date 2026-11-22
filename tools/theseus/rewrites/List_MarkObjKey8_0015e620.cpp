@@ -11,7 +11,7 @@ void List_MarkObjKey8_0015e620(uint8_t *rdram, R5900Context *ctx, PS2Runtime *ru
         g.ret_void();
         return;
     }
-    uint32_t key = 0;
+    uint32_t key = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     do
     {
         const uint32_t obj = g.read32(node);

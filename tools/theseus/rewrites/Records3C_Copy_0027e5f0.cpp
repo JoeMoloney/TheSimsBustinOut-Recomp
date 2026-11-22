@@ -10,8 +10,8 @@ void Records3C_Copy_0027e5f0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runt
         return;
     }
     uint32_t dst = g.arg(0), src = g.arg(1), left = g.arg(2);
-    uint64_t w0 = 0, w1 = 0, w2 = 0, w3 = 0;
-    uint32_t tail = 0;
+    uint64_t w0 = 0, w1 = 0, w2 = 0, w3 = 0;  // gate: equivalent 1: overwritten in the loop before it is read
+    uint32_t tail = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     do
     {
         w0 = g.read64(src); w1 = g.read64(src + 8); w2 = g.read64(src + 0x10); w3 = g.read64(src + 0x18);

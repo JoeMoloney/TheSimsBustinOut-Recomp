@@ -1,1 +1,2 @@
 mem32 0x409140 oneof 0 0x01008000
+mem32 0x0 fixed 0x12345   # read only by a mutant that walks a null head

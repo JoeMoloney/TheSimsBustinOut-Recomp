@@ -11,7 +11,7 @@ void List_MarkFirstKey5C_0015e578(uint8_t *rdram, R5900Context *ctx, PS2Runtime 
         return;
     }
     const uint32_t key = g.read32(g.arg(1) + 0x5C);
-    uint32_t last = 0;
+    uint32_t last = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     for (;;)
     {
         const uint32_t obj = g.read32(node);

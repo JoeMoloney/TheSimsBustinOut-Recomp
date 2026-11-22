@@ -6,7 +6,7 @@ void Slots_ResetAll_00231898(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runt
     theseus::Guest g{rdram, ctx, runtime};
     const uint32_t p = g.arg(0);
     g.write32(p + 0x4500, 0);
-    for (int32_t i = 63; i >= 0; --i)
+    for (int32_t i = 63; i >= 0; --i)  // gate: equivalent 64: slot 64 is p+0x4500, zeroed just above
         g.write32(p + 0x114 * static_cast<uint32_t>(i), 0);
     g.write32(p + 0x4504, 0);
     for (int32_t i = 31; i >= 0; --i)

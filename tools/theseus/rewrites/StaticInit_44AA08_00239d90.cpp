@@ -6,7 +6,7 @@ void StaticInit_44AA08_00239d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *r
     theseus::Guest g{rdram, ctx, runtime};
     if (g.arg64(1) != 0xFFFF || g.arg64(0) == 0)
     {
-        if (g.arg64(1) == 0xFFFF)
+        if (g.arg64(1) == 0xFFFF)  // only decides the scratch register v1 below; gate: equivalent
             SET_GPR_S32(ctx, 3, 0x450000);  // scratch register for callers (not ABI-compared); gate: equivalent
         g.ret(0xFFFF);
         return;

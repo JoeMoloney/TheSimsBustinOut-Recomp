@@ -6,10 +6,10 @@ void Table_FindHalf6_00347b50(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
     theseus::Guest g{rdram, ctx, runtime};
     if (g.read32(0x3F9188) == 0)
     {
-        g.write16(0x3F9260, 0);
-        g.write32(0x3F9188, 1);
-        g.write16(0x3F9262, 0);
-        g.write16(0x3F9264, 0);
+        g.write16(0x3F9260, 0);  // gate: equivalent write32: 0x3F9262 is zeroed below
+        g.write32(0x3F9188, 1);  // gate: equivalent write16: the flag is 0 here, its upper half stays 0
+        g.write16(0x3F9262, 0);  // gate: equivalent write32: 0x3F9264 is zeroed next
+        g.write16(0x3F9264, 0);  // gate: equivalent write32: 0x3F9266 is zeroed next
         g.write16(0x3F9266, 0);
     }
     const uint32_t entries = g.read32(g.arg(0) + 4);
@@ -17,7 +17,7 @@ void Table_FindHalf6_00347b50(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
     for (int32_t i = 0; i < static_cast<int32_t>(entries == 0 ? 0 : g.read32(entries - 4)); ++i)
     {
         const uint32_t e = entries + (static_cast<uint32_t>(i) << 3);
-        if (static_cast<int16_t>(g.read16(e + 6)) == key)
+        if (static_cast<int16_t>(g.read16(e + 6)) == key)  // gate: equivalent read32: truncated to int16_t
         {
             g.ret(e);
             return;

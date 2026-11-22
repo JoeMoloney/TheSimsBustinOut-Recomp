@@ -6,14 +6,14 @@ void Object9C_InitTable_003479a8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *
     theseus::Guest g{rdram, ctx, runtime};
     const uint32_t p = g.arg(0);
     const uint64_t self = g.arg64(0);
-    for (uint32_t off = 4; off < 0x84; off += 2)
-        g.write16(p + off, 0);
+    for (uint32_t off = 4; off < 0x84; off += 2)  // gate: equivalent <=,0x85: p+0x84 is stored (32-bit) below
+        g.write16(p + off, 0);  // gate: equivalent write32: the next halfword is zeroed next, the last spill (+0x84) stored below
     g.write32(p + 0x94, 50);
     g.write32(p + 0x98, 0xFFFFFFFFu);
     g.write32(p + 0x84, 3);
     g.write32(p + 0x8C, 0);
-    g.write16(p, 0);
-    g.write16(p + 2, 0);
+    g.write16(p, 0);  // gate: equivalent write32: p+2 is zeroed next
+    g.write16(p + 2, 0);  // gate: equivalent write32: p+4 was zeroed by the loop
     SET_GPR_S32(ctx, 3, -1);  // scratch register for callers (not ABI-compared); gate: equivalent
     SET_GPR_S32(ctx, 5, static_cast<int32_t>(p));  // scratch register for callers (not ABI-compared); gate: equivalent
     SET_GPR_S32(ctx, 4, 3);  // scratch register for callers (not ABI-compared); gate: equivalent

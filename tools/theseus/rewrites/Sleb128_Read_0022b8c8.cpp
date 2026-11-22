@@ -12,7 +12,7 @@ void Sleb128_Read_0022b8c8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtim
         value |= static_cast<uint32_t>(byte & 0x7F) << (shift & 31);
         shift += 7;
     } while (byte & 0x80);
-    if (shift < 32 && (byte & 0x40))
+    if (shift < 32 && (byte & 0x40))  // gate: equivalent <=,33: shift is a multiple of 7, never 32
         value |= 0xFFFFFFFFu << shift;
     g.write32(g.arg(1), value);
     g.ret(p);

@@ -11,7 +11,7 @@ void List12FBC_ClearFlag4000_00279610(uint8_t *rdram, R5900Context *ctx, PS2Runt
         g.ret(static_cast<uint32_t>(count));
         return;
     }
-    uint32_t slot = g.arg(0) + 0x12FBC, obj = 0;
+    uint32_t slot = g.arg(0) + 0x12FBC, obj = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     int32_t i = 0;
     do
     {

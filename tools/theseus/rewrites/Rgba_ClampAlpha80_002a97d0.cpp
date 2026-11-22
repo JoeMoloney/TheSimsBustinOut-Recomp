@@ -11,7 +11,7 @@ void Rgba_ClampAlpha80_002a97d0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *r
         g.ret_void();
         return;
     }
-    uint32_t p = g.arg(0), below = 0;
+    uint32_t p = g.arg(0), below = 0;  // gate: equivalent 1: below is overwritten in the loop (n > 0 here)
     do
     {
         below = g.read8(p + 3) < 0x81;

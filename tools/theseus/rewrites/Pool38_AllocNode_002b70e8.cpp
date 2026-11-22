@@ -5,9 +5,9 @@ void Pool38_AllocNode_002b70e8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *ru
 {
     theseus::Guest g{rdram, ctx, runtime};
     const uint32_t pool = g.arg(0);
-    const uint16_t index = g.read16(pool + 0x1092);
+    const uint16_t index = g.read16(pool + 0x1092);  // gate: equivalent read32: truncated to uint16_t
     if (index != 0)
-        g.write16(pool + 0x1092, g.read16(g.read32(pool + 0x1094) + index * 0x38u));
+        g.write16(pool + 0x1092, g.read16(g.read32(pool + 0x1094) + index * 0x38u));  // gate: equivalent read32: stored as a halfword
     const uint32_t node = index != 0 ? g.read32(pool + 0x1094) + index * 0x38u : 0;
     g.write32(pool + 0x109C, g.read32(pool + 0x109C) + 1);
     uint16_t back = 0;
@@ -17,9 +17,9 @@ void Pool38_AllocNode_002b70e8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *ru
         const uint32_t product = (g.arg(3) - g.read32(pool + 0x1094)) * 0xB6DB6DB7u;
         back = static_cast<uint16_t>(static_cast<int32_t>(product) >> 3);
     }
-    g.write16(node + 0x20, back);
+    g.write16(node + 0x20, back);  // gate: equivalent write32: the next halfword (+0x22) is zeroed by the loop below
     for (int32_t off = 0x30; off >= 0x22; off -= 2)
-        g.write16(node + static_cast<uint32_t>(off), 0);
+        g.write16(node + static_cast<uint32_t>(off), 0);  // gate: equivalent write32: the halfword after is zeroed next, or (+0x32/+0x33) stored below
     g.write8(node + 0x35, static_cast<uint8_t>(g.arg(1)));
     g.write8(node + 0x33, static_cast<uint8_t>(g.arg(2)));
     g.write8(node + 0x32, 0);

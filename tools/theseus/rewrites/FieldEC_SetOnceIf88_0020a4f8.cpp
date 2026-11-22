@@ -10,6 +10,6 @@ void FieldEC_SetOnceIf88_0020a4f8(uint8_t *rdram, R5900Context *ctx, PS2Runtime 
         return;
     }
     if (g.read32(g.arg(0) + 0xEC) == 0)
-        g.write32(g.arg(0) + 0xEC, 1);
+        g.write32(g.arg(0) + 0xEC, 1);  // gate: equivalent write16: the field is 0 here, its upper half stays 0
     g.ret(1);
 }

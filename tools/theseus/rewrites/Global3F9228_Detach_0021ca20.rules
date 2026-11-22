@@ -1,1 +1,3 @@
-mem32 0x3f9228 oneof 0 0x01008000
+mem32 0x3f9228 oneof 0 0x01008000 0x01008010
+mem32 0x01008010 oneof 0 0x10001
+mem32 0x3f922c fixed 0x12345678   # the next global: a write one byte off would clip it

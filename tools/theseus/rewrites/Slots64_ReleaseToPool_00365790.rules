@@ -4,3 +4,4 @@ a1 oneof 0x01008000 0x01008100 0x01008200
 mem32 0x01001000 oneof 0x01008000 0 0x01008100
 mem32 0x01001004 oneof 0x01008100 0 0x01008200
 mem32 0x010010fc oneof 0x01008200 0
+mem32 0x01001100 oneof 0x01008200 0   # slot 64, one past the table: a loop that ran too far would match it

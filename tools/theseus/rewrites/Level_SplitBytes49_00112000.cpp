@@ -8,20 +8,20 @@ void Level_SplitBytes49_00112000(uint8_t *rdram, R5900Context *ctx, PS2Runtime *
     if (g.arg64(1) == 0)
     {
         g.write8(p + 0x4A, 0);
-        g.write8(p + 0x49, 0);
+        g.write8(p + 0x49, 0);  // gate: equivalent write16: the byte after (+0x4A) was just zeroed
         g.ret(0xFFFFFFFFu);
         return;
     }
     if (level - 1 < 5)
     {
         g.write8(p + 0x4A, 0);
-        g.write8(p + 0x49, static_cast<uint8_t>(6 - level));
+        g.write8(p + 0x49, static_cast<uint8_t>(6 - level));  // gate: equivalent write16: the byte after (+0x4A) was just zeroed and 6 - level < 256
         g.ret(6 - level);
         return;
     }
     if (level - 6 < 5)
     {
-        g.write8(p + 0x49, 0);
+        g.write8(p + 0x49, 0);  // gate: equivalent write16: the byte after (+0x4A) is stored next
         g.write8(p + 0x4A, static_cast<uint8_t>(level - 5));
     }
     g.ret(level - 5);

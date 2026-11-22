@@ -7,3 +7,4 @@ mem32 0x0100924c fixed 0x01009300
 mem32 0x01009308 fixed 0x01009400
 a0 ptr_or_null
 a1 ptr_or_null
+mem32 0x0 fixed 0x12345   # a store through a null out-pointer would clobber this

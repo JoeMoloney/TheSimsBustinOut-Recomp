@@ -14,10 +14,10 @@ void Pow2_ToBlockCode_00344fd0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *ru
     g.write32(out, 0);
     switch (m)
     {
-    case 16: g.write32(out, 2); g.ret(16); return;
-    case 32: g.write32(out, 4); g.ret(16); return;
-    case 64: g.write32(out, 1); g.ret(32); return;
-    case 128: g.write32(out, 3); g.ret(32); return;
+    case 16: g.write32(out, 2); g.ret(16); return;  // gate: equivalent write16: out was zeroed above, its upper half stays 0
+    case 32: g.write32(out, 4); g.ret(16); return;  // gate: equivalent write16: out was zeroed above, its upper half stays 0
+    case 64: g.write32(out, 1); g.ret(32); return;  // gate: equivalent write16: out was zeroed above, its upper half stays 0
+    case 128: g.write32(out, 3); g.ret(32); return;  // gate: equivalent write16: out was zeroed above, its upper half stays 0
     default: g.ret(m); return;
     }
 }

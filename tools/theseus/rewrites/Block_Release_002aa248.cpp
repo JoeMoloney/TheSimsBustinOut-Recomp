@@ -10,7 +10,7 @@ void Block_Release_002aa248(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runti
         g.ret_void();
         return;
     }
-    const uint32_t flag = g.read32(block) & 1;
+    const uint32_t flag = g.read32(block) & 1;  // gate: equivalent read16: only bit 0 is used
     if (flag == 0)
     {
         g.ret(0);
@@ -19,7 +19,7 @@ void Block_Release_002aa248(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runti
     const int64_t block64 = g.sarg64(2);  // compared as a whole register
     const auto is_block = [&](uint32_t p) { return static_cast<int64_t>(static_cast<int32_t>(p)) == block64; };
     const uint32_t size = g.read32(block + 4);
-    if (size < g.read32(stats + 4))
+    if (size < g.read32(stats + 4))  // gate: equivalent <=: an equal size stores the same value
         g.write32(stats + 4, size);
     g.write32(stats + 8, g.read32(stats + 8) + g.read32(block + 8));
     // unlink from the list at owner + head_off (tail at +4), node links next_off / prev_off

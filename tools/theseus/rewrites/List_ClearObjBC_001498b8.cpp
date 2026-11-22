@@ -10,7 +10,7 @@ void List_ClearObjBC_001498b8(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
         g.ret_void();
         return;
     }
-    uint32_t obj = 0;
+    uint32_t obj = 0;  // gate: equivalent 1: overwritten in the loop before it is read
     do
     {
         obj = g.read32(node);

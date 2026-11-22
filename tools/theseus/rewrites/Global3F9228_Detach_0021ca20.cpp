@@ -7,7 +7,7 @@ void Global3F9228_Detach_0021ca20(uint8_t *rdram, R5900Context *ctx, PS2Runtime 
     const uint32_t obj = g.read32(0x3F9228);
     if (obj == 0)
     {
-        g.write32(0x3F9228, 0);
+        g.write32(0x3F9228, 0);  // gate: equivalent write16,drop: the global is already 0 here
         g.ret_void();  // v0 untouched
         return;
     }

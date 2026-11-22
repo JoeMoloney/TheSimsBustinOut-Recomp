@@ -1,10 +1,10 @@
 a1 ptr
 a2 ptr
-mem32 @a2+0x0 oneof 0 5 10 11 3
-mem32 @a1+0x0 oneof 0 5 10 11 6
-mem32 @sp+0x0 oneof 0 5 11 3
+mem32 @a2+0x0 oneof 0 5 10 11 3 0x10005 0xffffffff
+mem32 @a1+0x0 oneof 0 5 10 11 6 0x10005 0xffffffff
+mem32 @sp+0x0 oneof 0 5 11 3 0x10005
 a3 oneof 0 7
 a4 oneof 0 3
 a5 oneof 0 1 6 11 0x80000000
-a6 oneof 0 1 6 11 3
-a7 oneof 0 5 11 6
+a6 oneof 0 1 6 11 3 0x10006 0
+a7 oneof 0 5 11 6 0x10005

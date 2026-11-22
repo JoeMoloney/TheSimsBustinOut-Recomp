@@ -5,6 +5,6 @@ void Flag3F7BD8_SetOnce_00136e40(uint8_t *rdram, R5900Context *ctx, PS2Runtime *
 {
     theseus::Guest g{rdram, ctx, runtime};
     if (g.read32(0x3F7BD8) == 0)
-        g.write32(0x3F7BD8, 1);
+        g.write32(0x3F7BD8, 1);  // gate: equivalent write16: the word is 0 here, its upper half stays 0
     g.ret(1);
 }

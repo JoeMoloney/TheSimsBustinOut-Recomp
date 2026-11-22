@@ -15,7 +15,7 @@ void Table431A08_Remove_002259b0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *
             return;
         }
     }
-    for (; i < 9; ++i)
+    for (; i < 9; ++i)  // gate: equivalent <=,10: entry 9 is copied from entry 10, then zeroed right after
         g.write32(base + (static_cast<uint32_t>(i) << 2), g.read32(base + (static_cast<uint32_t>(i) << 2) + 4));
     g.write32(base + 0x24, 0);
     g.ret(1);

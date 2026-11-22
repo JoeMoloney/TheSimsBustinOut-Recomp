@@ -13,7 +13,7 @@ void Format_FromKind_002949b0(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
         return;
     }
     uint32_t code;
-    if (static_cast<int32_t>(g.arg(1)) > 0)
+    if (kind > 0)  // whole-register sign test (EE bgtz); gate: equivalent >=: kind == 0 returned above
     {
         if (kind == 1)
             code = 0x31;

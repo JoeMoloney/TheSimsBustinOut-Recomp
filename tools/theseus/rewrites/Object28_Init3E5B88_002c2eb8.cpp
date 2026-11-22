@@ -6,17 +6,17 @@ void Object28_Init3E5B88_002c2eb8(uint8_t *rdram, R5900Context *ctx, PS2Runtime 
     theseus::Guest g{rdram, ctx, runtime};
     const uint32_t p = g.arg(0);
     g.write32(p + 0x24, 0x3E5B88);
-    g.write16(p + 0x10, 0x40);
-    g.write8(p + 0x18, 1);
-    g.write8(p + 0x1A, 0x20);
+    g.write16(p + 0x10, 0x40);  // gate: equivalent write16,write32: +0x12 is stored below
+    g.write8(p + 0x18, 1);  // gate: equivalent write16,write32: +0x19 is stored below
+    g.write8(p + 0x1A, 0x20);  // gate: equivalent write16,write32: +0x1B is stored below
     g.write32(p + 0x20, 0x900DBEEF);
     g.write32(p, 0);
     g.write32(p + 4, 0);
     g.write32(p + 8, 0);
-    g.write16(p + 0x12, 0x40);
+    g.write16(p + 0x12, 0x40);  // gate: equivalent write16,write32: +0x14 is stored below
     g.write8(p + 0x19, 0);
-    g.write8(p + 0x1B, 0);
-    g.write16(p + 0x14, 0);
+    g.write8(p + 0x1B, 0);  // gate: equivalent write16,write32: +0x1C is stored below
+    g.write16(p + 0x14, 0);  // gate: equivalent write16,write32: +0x16 is stored next
     g.write16(p + 0x16, 0);
     g.write32(p + 0xC, 0);
     g.write32(p + 0x1C, 0);

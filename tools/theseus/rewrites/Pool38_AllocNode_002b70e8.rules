@@ -1,8 +1,8 @@
 a0 fixed 0x01001000
 mem32 0x01002090 oneof 0x00000000 0x00010000 0x00020000 0x00050000 0xabcd0003
-mem32 0x01002094 fixed 0x01008000
+mem32 0x01002094 fixed 0x01eff000   # array in the compared stack area above sp (outside the 64 KB window, stores would go unchecked); bits 16-23 nonzero, so a read16 of it shows in the index
 mem32 0x0100209c u32
 a1 u32
 a2 u32
-a3 oneof 0 0x01008000 0x01008038 0x01008070 0x01008118 0x01009c40
+a3 oneof 0 0x01eff000 0x01eff038 0x01eff070 0x01eff118 0x01f00c40
 a4 ptr

@@ -1,10 +1,12 @@
-mem32 0x3f9188 oneof 0 1 1
+mem32 0x3f9188 oneof 0 1 1 0x10000
 mem32 0x3f9260 u32
 mem32 0x3f9264 u32
 a0 ptr
 mem32 @a0+0x4 oneof 0 0x01009008 0x01009008
-mem32 0x01009004 oneof 0 1 2 3
+mem32 0x01009004 oneof 0 1 2 3 0xffff0002   # negative as 32 bits, 2 as 16
 mem32 0x0100900c oneof 0x00010000 0x00020000 0xffff0000 0x10000000
 mem32 0x01009014 oneof 0x00010000 0x00020000 0xffff0000
 mem32 0x0100901c oneof 0x00010000 0x00030000 0xffff0000
 a1 oneof 1 2 3 0xffffffff
+mem32 0x3f9268 fixed 0x12345678   # the next global: a 32-bit store at 0x3F9266 would clip it
+mem32 0x4 fixed 0x00010000   # RAM 4..7: entry 0 of a null table (key 1 at +6), read only by a mutant

@@ -2,13 +2,13 @@
 a0 ptr
 mem32 @a0+0x24 fixed 0x0100fff0
 mem32 @a0+0x28 oneof 0x0100fff0 0x0100fff4 0x01010000 0x01010008 0x01010010
-mem32 0x100fff0 oneof 1 2 3 4
-mem32 0x100fff4 oneof 1 2 3 4
-mem32 0x100fff8 oneof 1 2 3 4
-mem32 0x100fffc oneof 1 2 3 4
-mem32 0x1010000 oneof 1 2 3 4
-mem32 0x1010004 oneof 1 2 3 4
-mem32 0x1010008 oneof 1 2 3 4
-mem32 0x101000c oneof 1 2 3 4
+mem32 0x100fff0 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x100fff4 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x100fff8 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x100fffc oneof 1 2 3 4 0x10001 0x20003
+mem32 0x1010000 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x1010004 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x1010008 oneof 1 2 3 4 0x10001 0x20003
+mem32 0x101000c oneof 1 2 3 4 0x10001 0x20003
 a1 oneof 1 2 3 4 5 0x10001
 uncovered 0x2d1fa8 taken  needs end < found + 4 with found + 4 != end: not a valid vector

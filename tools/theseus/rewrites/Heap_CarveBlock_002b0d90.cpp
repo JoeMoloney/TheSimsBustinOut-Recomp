@@ -8,7 +8,7 @@ void Heap_CarveBlock_002b0d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
     const __m128i entry_v0 = GPR_VEC(ctx, 2);  // scratch register for callers (not ABI-compared); gate: equivalent
     bool v0_upper_zeroed = false;  // `movz v0, $zero` (next block past the heap end) clears all 128 bits
     uint32_t size = (g.arg(2) + 3) & ~3u;
-    if (!(7 < size))
+    if (!(7 < size))  // gate: equivalent <=,8: size is a multiple of 4, and 8 is replaced by 8
         size = 8;
     const uint32_t header = user - 8;
     const uint32_t block_end = block + (g.read32(block + 4) >> 3);
@@ -30,9 +30,9 @@ void Heap_CarveBlock_002b0d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
         if (n != 0)
             g.write32(n, header);
         g.write32(user - 8, block);
-        g.write32(block + 4, (g.read32(block + 4) & 7) | (lead << 3));
+        g.write32(block + 4, (g.read32(block + 4) & 7) | (lead << 3));  // gate: equivalent read16: only bits 0-2 are kept
         g.write32(heap + 0x5C, g.read32(heap + 0x5C) + 1);
-        v0 = g.read32(header + 4);
+        v0 = g.read32(header + 4);  // only v0's low 3 bits reach header+4, which line 122 overwrites; gate: equivalent
     }
     else
     {
@@ -49,12 +49,12 @@ void Heap_CarveBlock_002b0d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
         else
             g.write32(heap + 0x3C, n);
         if (lead == 0)
-            v0 = g.read32(header + 4);
+            v0 = g.read32(header + 4);  // only v0's low 3 bits reach header+4, which line 122 overwrites; gate: equivalent
         else
         {
             // give the small leading gap to the previous physical block
             const uint32_t after = next_phys(block);
-            v0_upper_zeroed |= after == 0;
+            v0_upper_zeroed |= after == 0;  // only v0's upper half (not ABI-compared); gate: equivalent
             const uint32_t prev_phys = g.read32(block);
             g.write32(header, prev_phys);
             if (after != 0)
@@ -68,7 +68,7 @@ void Heap_CarveBlock_002b0d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
                 g.write32(heap + 0x58, g.read32(heap + 0x58) + lead);
             }
             g.write32(heap + 0x54, g.read32(heap + 0x54) - lead);
-            v0 = g.read32(header + 4);
+            v0 = g.read32(header + 4);  // only v0's low 3 bits reach header+4, which line 122 overwrites; gate: equivalent
         }
     }
     const uint32_t with_trail = total + trail;
@@ -82,7 +82,7 @@ void Heap_CarveBlock_002b0d90(uint8_t *rdram, R5900Context *ctx, PS2Runtime *run
         g.write32(fb, header);
         g.write32(fb + 4, (trail << 3) | 1);
         const uint32_t after = next_phys(header);
-        v0_upper_zeroed |= after == 0;
+        v0_upper_zeroed |= after == 0;  // only v0's upper half (not ABI-compared); gate: equivalent
         if (after != 0)
             g.write32(after, fb);
         if (neighbour == 0)
