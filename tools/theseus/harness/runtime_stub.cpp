@@ -17,6 +17,8 @@
 namespace theseus_stub
 {
     Events g_events;
+    const char *g_skip_reason = nullptr;
+    const uint8_t *g_pristine = nullptr;
 
     namespace
     {

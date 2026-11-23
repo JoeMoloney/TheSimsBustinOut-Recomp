@@ -367,7 +367,7 @@ int main(int argc, char **argv)
     long strict_bad = 0, abi_bad = 0, v0_bad = 0, v0_high_bad = 0, mem_bad = 0, frame_bad = 0, event_bad = 0;
     long first_abi_case = -1, stray_pages = 0, first_stray_scan = -1;
     uint32_t first_stray_page = 0;
-    long total_returns = 0, total_transfers = 0, total_special = 0;
+    long total_returns = 0, total_transfers = 0, total_special = 0, skipped = 0;
 
     for (long c = 0; c < cases; ++c)
     {
@@ -443,14 +443,28 @@ int main(int argc, char **argv)
         init.pc = 0;
 
         R5900Context a = init, b = init;
+        // The rewrite runs first, so that a refused case (below) costs nothing: RAM A is still
+        // the untouched input, and the refusing implementation restores what it wrote from it.
+        // (The two runs are independent: separate RAM and contexts, events reset in between.)
+        theseus_stub::g_events = {};
+        theseus_stub::g_skip_reason = nullptr;
+        theseus_stub::g_pristine = mem_a;
+        theseus_rewrite(mem_b, &b, runtime);
+        theseus_stub::g_pristine = nullptr;
+        const theseus_stub::Events ev_b = theseus_stub::g_events;
+        if (theseus_stub::g_skip_reason)
+        {
+            // Refused by the second implementation (Unicorn: an input a real CPU faults on).
+            // Nothing is compared and the original is not run; RAM B is already equal to A.
+            if (skipped++ < 3)
+                std::printf("skipped case %ld: %s\n", c, theseus_stub::g_skip_reason);
+            continue;
+        }
         theseus_stub::g_events = {};
         g_cov_on = true;
         theseus_original(mem_a, &a, runtime);
         g_cov_on = false;
         const theseus_stub::Events ev_a = theseus_stub::g_events;
-        theseus_stub::g_events = {};
-        theseus_rewrite(mem_b, &b, runtime);
-        const theseus_stub::Events ev_b = theseus_stub::g_events;
         total_returns += ev_a.returns;
         total_transfers += ev_a.transfers;
         total_special += ev_a.special_loads + ev_a.special_stores;
@@ -523,6 +537,8 @@ int main(int argc, char **argv)
     }
 
     std::printf("cases=%ld seed=0x%llx\n", cases, (unsigned long long)seed);
+    if (skipped)
+        std::printf("skipped_cases=%ld (refused by the reference implementation; nothing compared)\n", skipped);
     std::printf("abi_mismatches=%ld strict_mismatches=%ld\n", abi_bad, strict_bad);
     std::printf("v0_low32_mismatches=%ld v0_high32_mismatches=%ld memory_mismatches=%ld"
                 " frame_mismatches=%ld (below sp, strict only)\n", v0_bad, v0_high_bad, mem_bad, frame_bad);

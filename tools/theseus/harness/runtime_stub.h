@@ -16,4 +16,10 @@ namespace theseus_stub
         long syscalls = 0, breaks = 0, traps = 0, exceptions = 0;
     };
     extern Events g_events;
+    // Set by an implementation that refuses a case (the Unicorn runner: an input a real CPU
+    // would fault on); the harness then counts the case as skipped and compares nothing.
+    extern const char *g_skip_reason;
+    // The case's input RAM, untouched (the harness runs the rewrite first): an implementation
+    // that refuses a case restores every page it wrote from here, so RAM B equals RAM A again.
+    extern const uint8_t *g_pristine;
 }
