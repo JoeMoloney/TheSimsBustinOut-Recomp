@@ -22,4 +22,7 @@ namespace theseus_stub
     // The case's input RAM, untouched (the harness runs the rewrite first): an implementation
     // that refuses a case restores every page it wrote from here, so RAM B equals RAM A again.
     extern const uint8_t *g_pristine;
+    // The function under test, when the harness re-enters it after an indirect jump inside it
+    // (the Unicorn bind sets it; 0/0 = treat every indirect jump as a tail jump out).
+    extern uint32_t g_func_start, g_func_end;
 }

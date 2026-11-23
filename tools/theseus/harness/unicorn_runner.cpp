@@ -6,12 +6,15 @@
 // from a real MIPS CPU: the kind of bug the normal gate cannot see, because it uses the
 // recompiled code as its reference.
 //
-// CPU model: MIPS64 5Kc. The PS2's R5900 is MIPS III plus movz/movn/pref (MIPS IV) plus its own
-// extensions; 5Kc runs MIPS III/IV code natively. R5900 differences handled here:
-//   - 3-operand `mult/multu rd, rs, rt` (reserved on 5Kc): emulated in the exception hook.
-// NOT modelled (functions using them are out of scope for now; difftest.py warns): the R5900
-// FPU (single precision only, no infinities/denormals, round toward zero), MMI and 128-bit
-// LQ/SQ, COP2, hardware registers (runtime Load/Store), the upper 64 bits of GPRs.
+// CPU model: MIPS64 5Kf (the 5Kc plus an FPU). The PS2's R5900 is MIPS III plus movz/movn/pref
+// (MIPS IV) plus its own extensions; the 5Kf runs MIPS III/IV integer code natively. R5900
+// instructions it would run differently are replaced by a trapping opcode and emulated (see
+// g_patched): 3-operand mult, the MMI multiply group, lq/sq, and the whole FPU except its
+// branches. The FPU is emulated by ps2_fpu_ref.h (PS2 floats, bit-exact hardware arithmetic by
+// default; UNICORN_FPU=nearest for IEEE rounding with PS2 range rules). bc1t/bc1f run natively on
+// the 5Kf's FCSR, whose condition bit mirrors FCR31.C (set_fcsr).
+// NOT modelled (functions using them are out of scope for now; difftest.py warns): other MMI,
+// COP2, hardware registers (runtime Load/Store), FCR31's cause/sticky flags other than DIV.S's.
 //
 // Calls out of the function are simulated exactly as the stub simulates the recompiled code's
 // calls (callGuest in runtime_stub.cpp), so both sides see the same callee effects and produce
@@ -22,12 +25,16 @@
 //   - the machine code faults on a real CPU: address error (unaligned access) or an address
 //     outside the 32 MiB of RAM below the hardware range. Such an input would crash a real
 //     PS2, so it is not one the original can receive. (The recompiled code carries on silently.)
+//     Includes jr/jalr to such an address, checked before the jump (an unmapped fetch corrupts
+//     Unicorn's translator), and gcc's `break 7` divide-by-zero trap;
+//   - more than kMaxInsns instructions: a loop count taken from random input.
 // Faults elsewhere (hardware registers, scratchpad, other exceptions) are NOT skipped: they show
 // up as event mismatches, since they are gaps in this model, not invalid inputs.
 #include "ps2_runtime_macros.h"
 #include "ps2_runtime.h"
 #include "runtime/ee_native_calls.h"
 #include "runtime_stub.h"
+#include "ps2_fpu_ref.h"
 
 #include <unicorn/unicorn.h>
 #include <cstdio>
@@ -38,8 +45,10 @@
 
 namespace
 {
-    constexpr uint64_t kMaxInsns = 20'000'000;  // a runaway loop counts as a failure
-    constexpr uint32_t kExcpAdEL = 12, kExcpAdES = 13, kExcpRI = 20, kExcpTLBL = 26, kExcpTLBS = 27;  // QEMU's MIPS exception numbers
+    // A case that runs longer is skipped: a loop count taken from random input (billions of
+    // iterations) is not an input the function gets, and the recompiled side has no limit.
+    constexpr uint64_t kMaxInsns = 2'000'000;
+    constexpr uint32_t kExcpBreak = 18, kExcpAdEL = 12, kExcpAdES = 13, kExcpRI = 20, kExcpTLBL = 26, kExcpTLBS = 27;  // QEMU's MIPS exception numbers
 
     struct Run
     {
@@ -52,6 +61,7 @@ namespace
         uint64_t prev_pc = 1;    // the instruction before last_pc (tells a delay slot from a branch target)
         const char *skip = nullptr;
         bool tail_jumped = false;
+        uint64_t resume_at = 0;  // after an emulated delay-slot instruction: restart here
         bool fault = false;
         uint64_t hi1 = 0, lo1 = 0;  // the R5900's second multiplier pipeline (not in the 5Kc)
     };
@@ -68,6 +78,7 @@ namespace
     uint8_t *g_mapped = nullptr;
     Run *g_run = nullptr;
     long g_reports = 0;
+    ps2fpu::Mode g_fpu_mode = ps2fpu::Mode::Exact;
 
     void mix(uint64_t value)  // same FNV-1a step as runtime_stub.cpp
     {
@@ -122,7 +133,17 @@ namespace
     {
         const uint32_t op = w >> 26, funct = w & 0x3F, rd = (w >> 11) & 31;
         return (op == 0 && (funct == 0x18 || funct == 0x19) && rd != 0) || op == 0x1C
-            || op == 0x1E || op == 0x1F;  // lq / sq (the 5Kc runs them as something else, silently)
+            || op == 0x1E || op == 0x1F    // lq / sq (the 5Kc runs them as something else, silently)
+            || (op == 0x11 && ((w >> 21) & 31) != 8)  // COP1 except bc1t/bc1f(l): IEEE, not PS2, floats
+            || op == 0x31 || op == 0x39 || op == 0x35 || op == 0x3D;  // lwc1 swc1 (ldc1 sdc1: not on the EE)
+    }
+
+    // FCR31's condition bit into the 5Kf's FCSR, which its native bc1t/bc1f test. The rest of FCSR
+    // stays 0 (no IEEE exceptions enabled: the 5Kf FPU never computes anything here).
+    void set_fcsr(uc_engine *uc, const R5900Context *ctx)
+    {
+        uint64_t v = ctx->fcr31 & ps2fpu::kC;
+        uc_reg_write(uc, UC_MIPS_REG_FCSR, &v);
     }
 
     uint8_t *g_ram_for_insn = nullptr;
@@ -139,6 +160,7 @@ namespace
 
     void mark_store(uc_engine *uc, uint32_t w);
     void unmapped_access(uint64_t address);
+    bool is_branch(uint32_t w);
 
     // Every instruction inside the function (cheap: the functions under test are small).
     void on_code(uc_engine *uc, uint64_t address, uint32_t, void *)
@@ -149,13 +171,34 @@ namespace
         const uint32_t w = insn_at(address);
         if (g_trace)
         {
-            uint64_t a0, a1, a2, ra;
+            uint64_t a0, a1, a2, s0, s1, ra;
             uc_reg_read(uc, UC_MIPS_REG_4, &a0); uc_reg_read(uc, UC_MIPS_REG_5, &a1);
-            uc_reg_read(uc, UC_MIPS_REG_6, &a2); uc_reg_read(uc, UC_MIPS_REG_31, &ra);
-            std::fprintf(stderr, "  trace %llx: %08x a0=%llx a1=%llx a2=%llx ra=%llx\n", (unsigned long long)address, w,
-                         (unsigned long long)a0, (unsigned long long)a1, (unsigned long long)a2, (unsigned long long)ra);
+            uc_reg_read(uc, UC_MIPS_REG_6, &a2); uc_reg_read(uc, UC_MIPS_REG_16, &s0);
+            uc_reg_read(uc, UC_MIPS_REG_17, &s1); uc_reg_read(uc, UC_MIPS_REG_31, &ra);
+            std::fprintf(stderr, "  trace %llx: %08x a0=%llx a1=%llx a2=%llx s0=%llx s1=%llx ra=%llx\n",
+                         (unsigned long long)address, w, (unsigned long long)a0, (unsigned long long)a1,
+                         (unsigned long long)a2, (unsigned long long)s0, (unsigned long long)s1, (unsigned long long)ra);
         }
         mark_store(uc, w);
+        // jr / jalr to an address with no RAM behind it (a function pointer read from random
+        // input): a real PS2 faults, so the case is skipped. Stopped here because letting Unicorn
+        // fetch from an unmapped address corrupts its translator, and the next run segfaults.
+        if ((w >> 26) == 0 && ((w & 0x3F) == 0x08 || (w & 0x3F) == 0x09))
+        {
+            uint64_t t64 = 0;
+            uc_reg_read(uc, UC_MIPS_REG_0 + ((w >> 21) & 31), &t64);
+            const uint32_t t = uint32_t(t64);
+            const uint32_t p = t >= 0x80000000u && t < 0xC0000000u ? t & 0x1FFFFFFFu : t;  // kseg0/1
+            const bool in_ram = (p >> 28 == 0 || p >> 28 == 2 || p >> 28 == 3)  // RAM and its mirrors
+                                && (p & 0x0FFFFFFFu) < PS2_RAM_SIZE;
+            if (!in_ram || (t & 3))
+            {
+                run.skip = (t & 3) ? "address error (unaligned jump target: a real PS2 would fault)"
+                                   : "jump to an address with no memory behind it (a real PS2 would fault)";
+                run.fault = true;
+                uc_emu_stop(uc);
+            }
+        }
     }
 
     // A block outside the function = a call (or tail jump) to another function.
@@ -172,12 +215,29 @@ namespace
             uc_reg_read(uc, UC_MIPS_REG_CP0_STATUS, &st);
             std::fprintf(stderr, "  block out %llx status %llx\n", (unsigned long long)address, (unsigned long long)st);
         }
+        // A b/beq/bc1t.. out of the function (a fragment such as a dataref_ switch case jumping
+        // back into its parent) compiles to `pc = target; return;` with no call: stop here too.
+        // (A `j` out compiles to a tail call of the target function, simulated below.)
+        {
+            const uint32_t bw = insn_at(run.last_pc - 4);
+            const uint32_t op = bw >> 26;
+            const bool fell_off_end = pc == run.end && run.last_pc + 4 == pc;  // also `pc = end; return;`
+            if (fell_off_end ||
+                (run.last_pc - 4 >= run.start && is_branch(bw) && op != 0x02 && op != 0x03 && op != 0x00
+                 && !(op == 0x01 && (((bw >> 16) & 0x1F) & 0x10))))  // not bltzal/bgezal(l)
+            {
+                run.tail_jumped = true;
+                uc_emu_stop(uc);
+                return;
+            }
+        }
         regs_from_uc(uc, run.ctx);
         const uint32_t ra = GPR_U32(run.ctx, 31);
         // jal/jalr set ra to an address inside the function; a tail jump leaves the caller's ra.
         const bool call = ra >= run.start && ra < run.end;
         ps2x::native::callGuest(*run.runtime, run.rdram, run.ctx, pc, ra);  // same simulation as the stub
         regs_to_uc(uc, run.ctx);
+        set_fcsr(uc, run.ctx);
         uint64_t next = int64_t(int32_t(ra));
         uc_reg_write(uc, UC_MIPS_REG_PC, &next);
         if (!call)
@@ -233,10 +293,10 @@ namespace
         std::memcpy(rdram + theseus_stub::kWindow, pristine + theseus_stub::kWindow, theseus_stub::kWindowSize);
     }
 
-    // R5900 instructions the 5Kc model rejects as reserved, emulated here. The faulting
+    // R5900 instructions patched to the trap word (g_patched), emulated here. The faulting
     // instruction is the code hook's last pc (inside the hook Unicorn's pc reads 0); Unicorn does
-    // not enter a guest exception handler, so writing pc = that + 4 resumes after it. (Not
-    // handled: one in a branch delay slot; it stays an exception and so a mismatch.)
+    // not enter a guest exception handler, so writing pc = that + 4 resumes after it; in a delay
+    // slot, pc = the branch's target instead (branch_target).
     //   SPECIAL mult/multu rd, rs, rt   5Kc decodes a nonzero rd as a DSP accumulator (no DSP ASE)
     //   MMI mult1/multu1, madd/maddu, madd1/maddu1, mfhi1/mflo1/mthi1/mtlo1
     // R5900 multiply: a 64-bit product of the low 32 bits of rs and rt (plus HI:LO for madd);
@@ -245,11 +305,14 @@ namespace
     {
         const uint32_t op = w >> 26;
         return (op >= 0x02 && op <= 0x07) || (op >= 0x14 && op <= 0x17) || op == 0x01
-            || (op == 0 && ((w & 0x3F) == 0x08 || (w & 0x3F) == 0x09));
+            || (op == 0 && ((w & 0x3F) == 0x08 || (w & 0x3F) == 0x09))
+            || (op == 0x11 && ((w >> 21) & 31) == 8);  // bc1t/bc1f(l)
     }
 
-    // The pc after the delay slot of the branch at `at`, evaluated on the current registers.
-    // Branches that link (jal, jalr, bltzal...) are not handled: false.
+    // The pc after the delay slot of the branch at `at`, evaluated on the current registers. For
+    // the linking ones (jal, jalr, bltzal...) QEMU has already written the link register (so a
+    // jalr whose rs is its own rd would read the link: gcc does not emit that); a target outside
+    // the function starts a new block, and on_block simulates the call as usual.
     bool branch_target(uc_engine *uc, uint64_t at, uint64_t &next)
     {
         const uint32_t w = insn_at(at), op = w >> 26, rt = (w >> 16) & 31;
@@ -266,10 +329,16 @@ namespace
         case 0x01:
             if (rt == 0x00 || rt == 0x02) { cond = a < 0; break; }   // bltz(l)
             if (rt == 0x01 || rt == 0x03) { cond = a >= 0; break; }  // bgez(l)
+            if (rt == 0x10 || rt == 0x12) { cond = a < 0; break; }   // bltzal(l) (ra already written)
+            if (rt == 0x11 || rt == 0x13) { cond = a >= 0; break; }  // bgezal(l)
             return false;
-        case 0x02: next = (at & ~0x0FFFFFFFull) | ((w & 0x03FFFFFF) << 2); return true;  // j
+        case 0x11:  // bc1f / bc1t / bc1fl / bc1tl: FCR31.C against the rt bit 0
+            if (((w >> 21) & 31) != 8) return false;
+            cond = ((g_run->ctx->fcr31 & ps2fpu::kC) != 0) == ((rt & 1) != 0);
+            break;
+        case 0x02: case 0x03: next = (at & ~0x0FFFFFFFull) | ((w & 0x03FFFFFF) << 2); return true;  // j / jal
         case 0x00:
-            if ((w & 0x3F) == 0x08) { next = uint64_t(a); return true; }  // jr
+            if ((w & 0x3F) == 0x08 || (w & 0x3F) == 0x09) { next = uint64_t(a); return true; }  // jr / jalr
             return false;
         default: return false;
         }
@@ -283,17 +352,81 @@ namespace
     {
         if (in_delay)
         {
-            uint64_t r[34];
-            for (int i = 1; i < 32; ++i) uc_reg_read(uc, UC_MIPS_REG_0 + i, &r[i]);
-            uc_reg_read(uc, UC_MIPS_REG_HI, &r[32]);
-            uc_reg_read(uc, UC_MIPS_REG_LO, &r[33]);
-            check(uc_context_restore(uc, g_clean), "context restore (delay slot)");
-            for (int i = 1; i < 32; ++i) uc_reg_write(uc, UC_MIPS_REG_0 + i, &r[i]);
-            uc_reg_write(uc, UC_MIPS_REG_HI, &r[32]);
-            uc_reg_write(uc, UC_MIPS_REG_LO, &r[33]);
+            // Redirecting pc from inside the exception hook leaves QEMU in the trap's
+            // pending-branch state: blocks translated afterwards can be wrong (an `addiu s1,s1,
+            // 0x24` silently did nothing in a loop whose bne delay slot held a trapped swc1).
+            // Stop instead; the run loop restarts at next_pc from the clean context.
+            g_run->resume_at = next_pc;
+            uc_emu_stop(uc);
+            return true;
         }
+        set_fcsr(uc, g_run->ctx);  // after an emulated c.cond / ctc1
         uc_reg_write(uc, UC_MIPS_REG_PC, &next_pc);
         return true;
+    }
+
+    // One COP1 instruction (not a branch) on the context's FPU registers, with PS2 semantics
+    // (ps2_fpu_ref.h). False for encodings the EE does not have: they stay an exception.
+    bool emulate_cop1(uc_engine *uc, uint32_t w)
+    {
+        R5900Context *ctx = g_run->ctx;
+        const uint32_t fmt = (w >> 21) & 31, ft = (w >> 16) & 31, fs = (w >> 11) & 31, fd = (w >> 6) & 31, funct = w & 0x3F;
+        auto fget = [&](uint32_t r) { uint32_t v; std::memcpy(&v, &ctx->f[r], 4); return v; };
+        auto fset = [&](uint32_t r, uint32_t v) { std::memcpy(&ctx->f[r], &v, 4); };
+        auto acc = [&] { uint32_t v; std::memcpy(&v, &ctx->f_acc, 4); return v; };
+        auto set_acc = [&](uint32_t v) { std::memcpy(&ctx->f_acc, &v, 4); };
+        auto gpr_set = [&](uint32_t r, uint32_t v32) {
+            if (!r) return;
+            uint64_t v = uint64_t(int64_t(int32_t(v32)));  // sign-extended to 64 bits
+            uc_reg_write(uc, UC_MIPS_REG_0 + r, &v);
+        };
+        auto gpr_get = [&](uint32_t r) { uint64_t v = 0; uc_reg_read(uc, UC_MIPS_REG_0 + r, &v); return uint32_t(v); };
+        auto set_c = [&](bool c) { ctx->fcr31 = c ? (ctx->fcr31 | ps2fpu::kC) : (ctx->fcr31 & ~ps2fpu::kC); };
+        const ps2fpu::Mode m = g_fpu_mode;
+        using namespace ps2fpu;
+        switch (fmt)
+        {
+        case 0: gpr_set(ft, fget(fs)); return true;                          // mfc1 rt, fs
+        case 4: fset(fs, gpr_get(ft)); return true;                          // mtc1 rt, fs
+        case 2: gpr_set(ft, fs == 31 ? ctx->fcr31 : fs == 0 ? 0x2E00u : 0u); return true;  // cfc1 (FCR0 = 0x2E00, as PCSX2)
+        case 6: if (fs == 31) ctx->fcr31 = gpr_get(ft); return true;         // ctc1 (only FCR31 is writable)
+        case 20:                                                             // W format: only cvt.s.w
+            if (funct != 0x20) return false;
+            fset(fd, cvt_s_w(m, fget(fs)));
+            return true;
+        case 16: break;
+        default: return false;
+        }
+        // S format. Operand fields as in the EE Core Instruction Set Manual: sqrt.s fd, ft and
+        // rsqrt.s fd, fs, ft use ft; the accumulator forms have no fd.
+        const uint32_t a = fget(fs), b = fget(ft);
+        switch (funct)
+        {
+        case 0x00: fset(fd, add(m, a, b)); return true;
+        case 0x01: fset(fd, sub(m, a, b)); return true;
+        case 0x02: fset(fd, mul(m, a, b)); return true;
+        case 0x03: ctx->fcr31 |= div_flags(a, b); fset(fd, div(m, a, b)); return true;
+        case 0x04: fset(fd, ps2fpu::sqrt(m, b)); return true;               // sqrt.s fd, ft
+        case 0x05: fset(fd, a & kFmax); return true;                         // abs.s
+        case 0x06: fset(fd, a); return true;                                 // mov.s
+        case 0x07: fset(fd, a ^ kSign); return true;                         // neg.s
+        case 0x16: fset(fd, rsqrt(m, a, b)); return true;                    // rsqrt.s fd, fs, ft = fs / sqrt(ft)
+        case 0x18: set_acc(add(m, a, b)); return true;                       // adda.s
+        case 0x19: set_acc(sub(m, a, b)); return true;                       // suba.s
+        case 0x1A: set_acc(mul(m, a, b)); return true;                       // mula.s
+        case 0x1C: fset(fd, madd(m, acc(), a, b, false)); return true;       // madd.s
+        case 0x1D: fset(fd, madd(m, acc(), a, b, true)); return true;        // msub.s
+        case 0x1E: set_acc(madd(m, acc(), a, b, false)); return true;        // madda.s
+        case 0x1F: set_acc(madd(m, acc(), a, b, true)); return true;         // msuba.s
+        case 0x24: fset(fd, cvt_w_s(a)); return true;                        // cvt.w.s
+        case 0x28: fset(fd, ps2fpu::max(a, b)); return true;                 // max.s
+        case 0x29: fset(fd, ps2fpu::min(a, b)); return true;                 // min.s
+        case 0x30: set_c(false); return true;                                // c.f.s
+        case 0x32: set_c(compare_key(a) == compare_key(b)); return true;     // c.eq.s
+        case 0x34: set_c(compare_key(a) < compare_key(b)); return true;      // c.lt.s
+        case 0x36: set_c(compare_key(a) <= compare_key(b)); return true;     // c.le.s
+        default: return false;
+        }
     }
 
     bool emulate_r5900(uc_engine *uc)
@@ -359,6 +492,39 @@ namespace
                 else
                     std::memset(mem + 8, 0, 8);
             }
+            return resume_after(uc, next_pc, in_delay);
+        }
+        else if (op == 0x31 || op == 0x39)
+        {
+            // lwc1 / swc1 ft, off(base): 32 bits; unaligned faults on a real PS2 (skipped).
+            const uint32_t address = uint32_t(get(int(rs)) + int64_t(int16_t(w & 0xFFFF)));
+            if (address & 3)
+            {
+                run.skip = "address error (unaligned access: a real PS2 would fault)";
+                run.fault = true;
+                uc_emu_stop(uc);
+                return true;
+            }
+            const uint32_t p = address >= 0x80000000u && address < 0xC0000000u ? address & 0x1FFFFFFFu : address;
+            const bool in_ram = (p < PS2_RAM_SIZE) || (p >= 0x20000000u && p < 0x20000000u + PS2_RAM_SIZE)
+                             || (p >= 0x30000000u && p < 0x30000000u + PS2_RAM_SIZE);
+            if (!in_ram)
+            {
+                unmapped_access(address);
+                uc_emu_stop(uc);
+                return true;
+            }
+            uint8_t *mem = run.rdram + (p & (PS2_RAM_SIZE - 1));
+            if (op == 0x31)
+                std::memcpy(&run.ctx->f[rt], mem, 4);
+            else
+                std::memcpy(mem, &run.ctx->f[rt], 4);
+            return resume_after(uc, next_pc, in_delay);
+        }
+        else if (op == 0x11)
+        {
+            if (!emulate_cop1(uc, w))
+                return false;
             return resume_after(uc, next_pc, in_delay);
         }
         else if (op == 0x1C && (funct >= 0x10 && funct <= 0x13))
@@ -471,6 +637,8 @@ namespace
             return;  // carry on after the instruction
         if (intno == kExcpAdEL || intno == kExcpAdES)
             run.skip = "address error (unaligned access: a real PS2 would fault)";
+        else if (intno == kExcpBreak)  // gcc's `break 7` after a zero divisor test: the game stops there
+            run.skip = "break (division by zero: a real PS2 enters its exception handler)";
         else if (intno == kExcpTLBL || intno == kExcpTLBS)  // kuseg outside the mapped RAM
             unmapped_access(effective_address(uc, run.last_pc));
         else
@@ -492,7 +660,7 @@ namespace
         if (!g_uc)
         {
             check(uc_open(UC_ARCH_MIPS, uc_mode(UC_MODE_MIPS64 | UC_MODE_LITTLE_ENDIAN), &g_uc), "open");
-            check(uc_ctl_set_cpu_model(g_uc, UC_CPU_MIPS64_5KC), "cpu model");
+            check(uc_ctl_set_cpu_model(g_uc, UC_CPU_MIPS64_5KF), "cpu model");
             uc_hook h;
             check(uc_hook_add(g_uc, &h, UC_HOOK_CODE, (void *)on_code, nullptr, start, end - 1), "code hook");
             check(uc_hook_add(g_uc, &h, UC_HOOK_BLOCK, (void *)on_block, nullptr, 1, 0), "block hook");
@@ -503,6 +671,13 @@ namespace
                 check(uc_hook_add(g_uc, &h, UC_HOOK_CODE, (void *)+[](uc_engine *, uint64_t a, uint32_t, void *) {
                     std::fprintf(stderr, "  any %llx: %08x\n", (unsigned long long)a, a < PS2_RAM_SIZE ? insn_at(a) : 0u);
                 }, nullptr, 1, 0), "trace-all hook");
+            // COP1 usable, so that bc1t/bc1f run (all other COP1 instructions are patched to traps).
+            uint64_t status = 0;
+            uc_reg_read(g_uc, UC_MIPS_REG_CP0_STATUS, &status);
+            status |= 1u << 29;
+            uc_reg_write(g_uc, UC_MIPS_REG_CP0_STATUS, &status);
+            if (const char *mode = std::getenv("UNICORN_FPU"))
+                g_fpu_mode = std::strcmp(mode, "nearest") == 0 ? ps2fpu::Mode::Nearest : ps2fpu::Mode::Exact;
             check(uc_context_alloc(g_uc, &g_clean), "context alloc");
             check(uc_context_save(g_uc, g_clean), "context save");
         }
@@ -536,6 +711,13 @@ namespace
 void theseus_unicorn(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime, uint32_t start, uint32_t end)
 {
     setup(rdram, start, end);
+    // UNICORN_TRACE_CASE=n traces only case n (the harness runs this side for every case,
+    // skipped ones included, so the call count is the case number).
+    static long call_no = -1;
+    static const char *trace_case = std::getenv("UNICORN_TRACE_CASE");
+    ++call_no;
+    if (trace_case)
+        g_trace = call_no == std::atol(trace_case);
     const uint32_t ra = GPR_U32(ctx, 31);
     if (ra >= start && ra < end)
     {
@@ -567,13 +749,36 @@ void theseus_unicorn(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime, uin
     // exception in a delay slot an ordinary store later raised "reserved instruction".
     check(uc_context_restore(g_uc, g_clean), "context restore");
     regs_to_uc(g_uc, ctx);
+    set_fcsr(g_uc, ctx);
     if (g_trace)
     {
         uint64_t st = 0;
         uc_reg_read(g_uc, UC_MIPS_REG_CP0_STATUS, &st);
         std::fprintf(stderr, "  start status %llx\n", (unsigned long long)st);
     }
-    const uc_err err = uc_emu_start(g_uc, start, run.until, 0, kMaxInsns);
+    uc_err err = uc_emu_start(g_uc, start, run.until, 0, kMaxInsns);
+    // Restart after each emulated delay-slot instruction (resume_after). The instruction budget
+    // is per start, so the restarts are capped as well: a loop like that runs once per iteration.
+    for (long restarts = 0; run.resume_at && err == UC_ERR_OK && !run.skip && !run.fault; ++restarts)
+    {
+        if (restarts > 20000)
+        {
+            run.skip = "over the instruction limit (a loop count from random input)";
+            break;
+        }
+        const uint64_t at = run.resume_at;
+        run.resume_at = 0;
+        uint64_t r[34];
+        for (int i = 1; i < 32; ++i) uc_reg_read(g_uc, UC_MIPS_REG_0 + i, &r[i]);
+        uc_reg_read(g_uc, UC_MIPS_REG_HI, &r[32]);
+        uc_reg_read(g_uc, UC_MIPS_REG_LO, &r[33]);
+        check(uc_context_restore(g_uc, g_clean), "context restore (delay slot)");
+        for (int i = 1; i < 32; ++i) uc_reg_write(g_uc, UC_MIPS_REG_0 + i, &r[i]);
+        uc_reg_write(g_uc, UC_MIPS_REG_HI, &r[32]);
+        uc_reg_write(g_uc, UC_MIPS_REG_LO, &r[33]);
+        set_fcsr(g_uc, ctx);
+        err = uc_emu_start(g_uc, at, run.until, 0, kMaxInsns);
+    }
     uint64_t pc = 0;
     uc_reg_read(g_uc, UC_MIPS_REG_PC, &pc);
     regs_from_uc(g_uc, ctx);
@@ -593,9 +798,8 @@ void theseus_unicorn(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime, uin
     }
     else if (!run.fault && !run.tail_jumped && pc != run.until)  // the instruction limit
     {
-        report("instruction limit reached (runaway loop?)", 0);
-        ++theseus_stub::g_events.exceptions;
-        mix(0xEF000000ull);
+        theseus_stub::g_skip_reason = "over the instruction limit (a loop count from random input)";
+        restore(rdram);
     }
     // A normal return records no event: the generated code's `jr $ra` only sets pc (its Return
     // dispatch exists only with PS2X_STRICT_RETURN_DIAGNOSTICS).

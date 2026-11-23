@@ -107,7 +107,15 @@ namespace
     uint32_t g_tree_nodes = 0;
     uint32_t tree_node_addr(uint32_t i) { return kTreeArea + kTreeNodeSize * (1 + i); }
 
-    uint32_t window_ptr(Rng &r) { return kWindow + r.below(kWindowSize / 2); }
+    // A pointer into the window: 16-byte aligned 3 times in 4 (structs, floats and vectors are
+    // aligned; a real PS2 faults on an unaligned word access, so those cases are wasted under the
+    // Unicorn reference), any byte otherwise (char strings, byte buffers, and unaligned-handling
+    // code paths).
+    uint32_t window_ptr(Rng &r)
+    {
+        const uint32_t off = r.below(kWindowSize / 2);
+        return kWindow + (r.below(4) ? off & ~15u : off);
+    }
 
     uint64_t sext32(uint32_t v) { return uint64_t(int64_t(int32_t(v))); }
 

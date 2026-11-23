@@ -19,6 +19,7 @@ namespace theseus_stub
     Events g_events;
     const char *g_skip_reason = nullptr;
     const uint8_t *g_pristine = nullptr;
+    uint32_t g_func_start = 0, g_func_end = 0;
 
     namespace
     {
@@ -113,6 +114,14 @@ bool PS2Runtime::dispatchGuestBranch(uint8_t *rdram, R5900Context *ctx, uint32_t
         simulate_call(rdram, ctx, targetPc, fallthroughPc);  // generated code set ra already
         return true;                                         // continue after the call
     default:
+        // A jump-table `jr` to a label of the function itself: the game's dispatcher re-enters
+        // the function there (its entry switch), as the harness's re-entry loop does. No event.
+        if (kind == GuestBranchKind::IndirectJump && targetPc >= theseus_stub::g_func_start &&
+            targetPc < theseus_stub::g_func_end)
+        {
+            ctx->pc = targetPc;
+            return false;
+        }
         // Tail jump: the callee returns straight to our caller.
         simulate_call(rdram, ctx, targetPc, GPR_U32(ctx, 31));
         return false;
