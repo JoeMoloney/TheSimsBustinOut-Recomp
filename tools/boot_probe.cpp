@@ -98,6 +98,8 @@ void install(PS2Runtime &runtime) {
     }
 }
 } // namespace func_trace
+
+void ps2CallCountsAtExit(); // PS2Recomp ps2_runtime.cpp: SIMS_CALL_COUNTS "end:<file>" snapshot
 #ifdef SIMS_NATIVE_BINDINGS
 void registerNativeBindings(PS2Runtime &runtime);
 #endif
@@ -187,6 +189,7 @@ int main(int argc, char **argv) {
     }
     finished.notify_one();
     watchdog.join();
+    ps2CallCountsAtExit();
 #ifdef SIMS_THESEUS
     printTheseusStats();
 #endif

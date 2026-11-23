@@ -10,7 +10,7 @@ bstring_Wide16FromWide32_002c8f68	C	shipped	PASS-ABI	1.000	pilot	gate.py 2026-11
 bstring_WideFromNarrow_002c8fa0	C	gated	PASS-ABI	1.000	pilot	gate.py 2026-11-18: PASS-ABI; mutants 16/16; callers ok (1 sites)
 RegisteredObject_Construct_002cb4d8	C	shipped	PASS-ABI	1.000	pilot	gate.py 2026-11-18: PASS-ABI; mutants 25/25; callers ok (5 sites)
 BitArray_Read_002ac6b8	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 37/37; callers ok (38 sites)
-Field584_PositiveElse5BC_0015c9b8	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 8/8; callers ok (25 sites)
+Field584_PositiveElse5BC_0015c9b8	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-23: PASS-ABI; mutants 8/8; callers ok (25 sites); branches 2/2
 Flags38_SetBit28_00187390	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 6/6; callers ok (95 sites)
 Flags_HasAll_00345150	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 5/5; callers ok (68 sites)
 GlobalTable_EntryFieldC_00258248	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 6/6; callers ok (89 sites)
@@ -26,7 +26,7 @@ TwoSlot_Value_00258268	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI;
 TypeTag_IsFlaggedType11_00232da8	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 7/7; callers ok (128 sites)
 TypeTag_IsFlaggedType23_00232df8	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 7/7; callers ok (128 sites)
 TypeTag_IsFlaggedType24_00232dd0	C	shipped	PASS-ABI	1.000	B1	gate.py 2026-11-18: PASS-ABI; mutants 6/6; callers ok (128 sites)
-Array44_At_00370968	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 17/17; callers ok (20 sites); branches 4/4
+Array44_At_00370968	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-23: PASS-ABI; mutants 17/17; callers ok (20 sites); branches 4/4
 ArrayAfterHeader_00347028	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 5/5; callers ok (26 sites); branches 0/0
 Bits72_TestUnlessGlobal_00166158	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 14/14; callers ok (17 sites); branches 2/2
 Byte_AtLeast2_001667b8	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 6/6; callers ok (8 sites); branches 0/0
@@ -68,7 +68,7 @@ Slots130_NonEmpty_002f0568	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-A
 Table10_Entry_002581b0	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 6/6; callers ok (22 sites); branches 0/0
 Table46c008_At_00345778	C	gated	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 8/8; callers ok (11 sites); branches 0/0
 TypeTag_DataPtr_0024bf48	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 27/27; callers ok (28 sites); branches 26/26
-Vector4_At_00347600	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 18/18; callers ok (6 sites); branches 4/4
+Vector4_At_00347600	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-23: PASS-ABI; mutants 18/18; callers ok (6 sites); branches 4/4
 Vector_Count4_00347638	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 7/7; callers ok (11 sites); branches 0/0
 WStr16_Compare_002bbd78	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 22/22; callers ok (11 sites); branches 8/8
 WStr16_LengthOrZero_002bb978	C	shipped	PASS-ABI	1.000	2	gate.py 2026-11-19: PASS-ABI; mutants 11/11; callers ok (6 sites); branches 6/6
@@ -83,7 +83,7 @@ PtrVector_FindNthByKey_002000e8	C	shipped	PASS-ABI	1.000	3	gate.py 2026-11-19: P
 bstring2_CStr_002cac50	C	shipped	PASS-ABI	1.000	nonleaf1	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (255 sites); branches 4/4
 OperatorDelete_00102610	C	shipped	PASS-ABI	1.000	nonleaf1	gate.py 2026-11-19: PASS-ABI; mutants 2/2; callers ok (791 sites); branches 0/0
 Heap_Free_00268500	C	shipped	PASS-ABI	1.000	nonleaf1	gate.py 2026-11-19: PASS-ABI; mutants 8/8; callers ok (374 sites); branches 0/0
-Array0C_AtOrDefault_00240e48	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 18/18; callers ok (5 sites); branches 6/6
+Array0C_AtOrDefault_00240e48	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-23: PASS-ABI; mutants 18/18; callers ok (5 sites); branches 6/6
 Array168_Back_00329450	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 13/13; callers ok (4 sites); branches 2/2
 BitArray_Test_002ac448	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 17/17; callers ok (3 sites); branches 2/2
 Bits90_Test_00256f18	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 10/10; callers ok (4 sites); branches 0/0
@@ -106,7 +106,7 @@ Flags08_HasAll_00257ba8	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI;
 Flags1C_HasAll_00257ec0	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 17/17; callers ok (26 sites); branches 2/2
 Global3f8a68_In1to3_001bbdd0	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 7/7; callers ok (10 sites); branches 0/0
 Global3fa628_Field0C_001b8420	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 4/4; callers ok (2 sites); branches 0/0
-Index3C_AtLeastLimitMinus2_001c4200	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 14/14; callers ok (4 sites); branches 2/2
+Index3C_AtLeastLimitMinus2_001c4200	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-23: PASS-ABI; mutants 14/14; callers ok (4 sites); branches 2/2
 Kind16_ToFlag_002c73d0	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 6/6; callers ok (4 sites); branches 8/8
 List1C_MaxRunSum_002aa6d8	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 18/18; callers ok (3 sites); branches 8/8
 List8_FindItemFlag3_0019bf48	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (23 sites); branches 8/8
@@ -120,13 +120,13 @@ PtrVector_RankByKeyFlagValue_00200088	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11
 Registry_LookupById_0017d5b8	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 23/23; callers ok (7 sites); branches 10/10
 Ring_Used_002b36a8	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 8/8; callers ok (4 sites); branches 2/2
 SByte3_Less_002cc0e8	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (9 sites); branches 10/10
-SortedArray12_FindKey16_001d1c80	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 24/24; callers ok (3 sites); branches 8/8
-SortedArray8_LowerBound_00277a68	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 14/14; callers ok (3 sites); branches 8/8
+SortedArray12_FindKey16_001d1c80	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-23: PASS-ABI; mutants 24/24; callers ok (3 sites); branches 8/8
+SortedArray8_LowerBound_00277a68	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-23: PASS-ABI; mutants 14/14; callers ok (3 sites); branches 8/8
 Str_Crc32_002ad410	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (40 sites); branches 4/4
 Str_Hash33_0023d608	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 4/4; callers ok (4 sites); branches 2/2
 Str_HashUpper5_002bcf38	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (3 sites); branches 6/6
 Table46c408_At_00345798	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 7/7; callers ok (9 sites); branches 0/0
-Table_LookupById_0012fa78	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 16/16; callers ok (3 sites); branches 8/8
+Table_LookupById_0012fa78	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-23: PASS-ABI; mutants 16/16; callers ok (3 sites); branches 8/8
 Tree18_FindOrParent_002b4b80	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 13/13; callers ok (3 sites); branches 8/8
 WStr16_DiffN_00349cd8	C	shipped	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 16/16; callers ok (3 sites); branches 8/8
 WStr16_Diff_00349c08	C	gated	PASS-ABI	1.000	4	gate.py 2026-11-19: PASS-ABI; mutants 12/12; callers ok (3 sites); branches 6/6
@@ -161,8 +161,8 @@ Slots224_Bit1_00189578	C	gated	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mu
 Vector_Bytes_003471e8	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 5/5; callers ok (3 sites); branches 0/0
 Vector_Count16_00351558	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 7/7; callers ok (4 sites); branches 0/0
 Vector_Count24_0036a588	C	gated	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 7/7; callers ok (2 sites); branches 0/0
-Wrap12Diff_20_2B8_0035ce60	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
-Wrap12Diff_24_2BC_0035ceb8	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
+Wrap12Diff_20_2B8_0035ce60	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
+Wrap12Diff_24_2BC_0035ceb8	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
 Wrap12Sum_20_2B8_0035ce88	C	shipped	PASS-ABI	1.000	5	gate.py 2026-11-19: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
 List8_FindItemCC_00141a88	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (3 sites); branches 6/6
 Const_00410390_001d3c88	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 1/1; callers ok (2 sites); branches 0/0
@@ -171,16 +171,16 @@ PtrArray384_FindByField8_002e0c20	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20:
 PtrSlots64_AnyField328_00366068	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 14/14; callers ok (2 sites); branches 6/6
 List8_FindItem80_0019c4b0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 8/8
 HashChain_FindKeyC_002b0218	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 16/16; callers ok (2 sites); branches 6/6
-Array24_AtOneBased_0036a5a8	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 18/18; callers ok (2 sites); branches 4/4
+Array24_AtOneBased_0036a5a8	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 18/18; callers ok (2 sites); branches 4/4
 Str16_FindChar_00349d20	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 9/9; callers ok (2 sites); branches 8/8
 HourWrap12_0035cee0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 2/2
-List8_NthItem_0019bf98	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 14/14; callers ok (2 sites); branches 8/8
-Slots8_FirstLive_0023dfd0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 18/18; callers ok (2 sites); branches 8/8
-Offset16OrDefaultTable_00369570	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 26/26; callers ok (3 sites); branches 10/10
-CountedArray_IndexOf_001644f0	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (3 sites); branches 8/8
+List8_NthItem_0019bf98	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 14/14; callers ok (2 sites); branches 8/8
+Slots8_FirstLive_0023dfd0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 18/18; callers ok (2 sites); branches 8/8
+Offset16OrDefaultTable_00369570	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 26/26; callers ok (3 sites); branches 10/10
+CountedArray_IndexOf_001644f0	C	gated	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (3 sites); branches 8/8
 RangeHitsRing_0029c0a0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 17/17; callers ok (3 sites); branches 10/10
-Records8_BSearchKey16_002c70b8	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 25/25; callers ok (2 sites); branches 8/8
-Records16_BSearchKey16_002c8318	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 25/25; callers ok (2 sites); branches 8/8
+Records8_BSearchKey16_002c70b8	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 25/25; callers ok (2 sites); branches 8/8
+Records16_BSearchKey16_002c8318	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-23: PASS-ABI; mutants 25/25; callers ok (2 sites); branches 8/8
 Slots8_NextLive_0023e020	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 17/17; callers ok (2 sites); branches 8/8
 FileMagic_Kind_00228098	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 27/27; callers ok (2 sites); branches 4/4
 Rects20_FirstOverlap_003704e0	C	shipped	PASS-ABI	1.000	6	gate.py 2026-11-20: PASS-ABI; mutants 25/25; callers ok (3 sites); branches 12/12
@@ -249,7 +249,7 @@ Table3A8BC0_IndexOf4_002ed150	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PAS
 Table3A8BD0_IndexOf6_002ed188	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 9/9; callers ok (1 sites); branches 4/4
 Bits16_Count_001d27f0	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 7/7; callers ok (1 sites); branches 2/2
 Field34_Deref_0021c2f8	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 4/4; callers ok (1 sites); branches 0/0
-Array_IndexOf_0023b538	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (8 sites); branches 6/6
+Array_IndexOf_0023b538	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (8 sites); branches 6/6
 List7C_MaxU64At70_002a2ff8	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 9/9; callers ok (1 sites); branches 4/4
 Bst_FindKey10_002bd580	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
 PageTable20_Address_002c3890	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (2 sites); branches 0/0
@@ -258,28 +258,28 @@ PtrVec24_FindValue_0021c5b0	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-
 PtrVec0_FindValue_0021c9b0	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (2 sites); branches 6/6
 List10_Length_002b5308	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 7/7; callers ok (1 sites); branches 4/4
 Field38C_NotMagics_00169b58	C	gated	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 4/4
-Array16_SumField4_0027c808	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 4/4
+Array16_SumField4_0027c808	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 4/4
 Arena_FitsAligned_002a9e28	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 15/15; callers ok (2 sites); branches 2/2
 BitArray_WordCount_002ac678	C	shipped	PASS-ABI	1.000	8	gate.py 2026-11-20: PASS-ABI; mutants 6/6; callers ok (1 sites); branches 0/0
 Bits16_IsSingle_00101bb8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 10/10; callers ok (1 sites); branches 6/6
 GlobalArray3FA5D4_AtBelowLast_0012e318	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 18/18; callers ok (1 sites); branches 4/4
-Records1C_IndexOfKey_00167b18	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 6/6
+Records1C_IndexOfKey_00167b18	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 6/6
 SizedRecords_CountBothSet_0022bc80	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 15/15; callers ok (2 sites); branches 6/6
-Records110_FindKey100_00231c28	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
-Records10C_FindKey100_002326a8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
+Records110_FindKey100_00231c28	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
+Records10C_FindKey100_002326a8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
 Tree18_InsertParent_002b4bd8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 6/6
 Str_IndexOfChar_002aeb58	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 9/9; callers ok (1 sites); branches 4/4
-CountedArray_IndexOfC0_00164498	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 8/8
-Bytes_XorRotHash_00141368	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 15/15; callers ok (1 sites); branches 6/6
+CountedArray_IndexOfC0_00164498	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 8/8
+Bytes_XorRotHash_00141368	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 15/15; callers ok (1 sites); branches 6/6
 Char16_Range_002c7438	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 15/15; callers ok (1 sites); branches 6/6
 Map1234_001711c0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 7/7; callers ok (2 sites); branches 10/10
 Str16_IndexOfChar_002bc268	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 10/10; callers ok (1 sites); branches 6/6
 Bits16_Count_002e5330	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 7/7; callers ok (1 sites); branches 2/2
 Rect_InsideRect_00350d48	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 23/23; callers ok (2 sites); branches 8/8
-PtrVec_Contains_0013a668	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 17/17; callers ok (2 sites); branches 8/8
+PtrVec_Contains_0013a668	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 17/17; callers ok (2 sites); branches 8/8
 PadBits_Remap_0024a7d0	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 15/15; callers ok (1 sites); branches 2/2
-Grid12x12_CountField10_0035ccf8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 4/4
-Grid12x12_CountField0CIs4_0035cd58	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 4/4
+Grid12x12_CountField10_0035ccf8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 4/4
+Grid12x12_CountField0CIs4_0035cd58	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 4/4
 Bits8_Count_003754f0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 6/6; callers ok (1 sites); branches 0/0
 PtrVec50_FindValue_00201b88	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 6/6
 RangeHitsRing_0029bf88	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 17/17; callers ok (2 sites); branches 10/10
@@ -287,26 +287,26 @@ RangeHitsRing_002a3e00	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; 
 Rect_InsideRectOrNull_003713d0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 27/27; callers ok (1 sites); branches 10/10
 Str_CompareNoCase_00228028	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 11/11; callers ok (1 sites); branches 4/4
 Records114_AllValid_002323b8	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 27/27; callers ok (2 sites); branches 14/14
-U32Array_BinaryFind_002767a0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 19/19; callers ok (1 sites); branches 8/8
-Records8_BSearchKey32_003676c8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 23/23; callers ok (1 sites); branches 8/8
-Records16_BSearchKey32_00367fa8	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 23/23; callers ok (1 sites); branches 8/8
-Entries20_PrevEnd_002805d0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-20: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 8/8
+U32Array_BinaryFind_002767a0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 19/19; callers ok (1 sites); branches 8/8
+Records8_BSearchKey32_003676c8	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 23/23; callers ok (1 sites); branches 8/8
+Records16_BSearchKey32_00367fa8	C	gated	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 23/23; callers ok (1 sites); branches 8/8
+Entries20_PrevEnd_002805d0	C	shipped	PASS-ABI	1.000	9	gate.py 2026-11-23: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 8/8
 List68_MaxU64At50_002a9a10	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 9/9; callers ok (1 sites); branches 6/6
-Records12_BSearchKey32At0_00166430	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
-Records12_BSearchKey16At6_00303998	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 26/26; callers ok (2 sites); branches 8/8
-Records7C_BSearchKey32At0_0031e1f0	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
-Records1C_BSearchKey16At10_00347ad0	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
-Records1C_FindKey16_00167988	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 8/8
+Records12_BSearchKey32At0_00166430	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
+Records12_BSearchKey16At6_00303998	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 26/26; callers ok (2 sites); branches 8/8
+Records7C_BSearchKey32At0_0031e1f0	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
+Records1C_BSearchKey16At10_00347ad0	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 26/26; callers ok (1 sites); branches 8/8
+Records1C_FindKey16_00167988	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 8/8
 HashSet8_Member_00228d68	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 14/14
 SmallSet_Member_0033c338	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 8/8; callers ok (2 sites); branches 24/24
 Char_EqualNoCase_002aee50	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 14/14
-Records8_BSearchKey32At0_002c8388	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 25/25; callers ok (1 sites); branches 8/8
-Records8_BSearchKey32At4_003432c8	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 25/25; callers ok (1 sites); branches 8/8
-S16_Find_002c8248	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 26/26
-Word_Find_002e6498	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 26/26
+Records8_BSearchKey32At0_002c8388	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 25/25; callers ok (1 sites); branches 8/8
+Records8_BSearchKey32At4_003432c8	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 25/25; callers ok (1 sites); branches 8/8
+S16_Find_002c8248	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 26/26
+Word_Find_002e6498	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 26/26
 List8_IndexOfFlag3_0019c7c0	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 13/13; callers ok (2 sites); branches 4/4
 Table3A46C0_Canonical_0015eba8	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 20/20; callers ok (1 sites); branches 28/28
-IntervalTable_InnermostValue_0022ad68	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 36/36; callers ok (1 sites); branches 22/22
+IntervalTable_InnermostValue_0022ad68	C	gated	PASS-ABI	1.000	10	gate.py 2026-11-23: PASS-ABI; mutants 36/36; callers ok (1 sites); branches 22/22
 Fp_CmpPartsD_0022a1f8	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 61/61; callers ok (1 sites); branches 26/26
 Fp_PackD_00229918	C	shipped	PASS-ABI	1.000	10	gate.py 2026-11-20: PASS-ABI; mutants 53/53; callers ok (6 sites); branches 18/18
 Str_InitStatic3A8AD0_002bb9b8	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-ABI; mutants 5/5; callers ok (240 sites); branches 0/0
@@ -338,7 +338,7 @@ Field70_PushWord_002a5510	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-A
 Word_Set_0035e4a0	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-ABI; mutants 5/5; callers ok (12 sites); branches 0/0
 Words_Copy_001022c0	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-ABI; mutants 12/12; callers ok (9 sites); branches 4/4
 Object24_Init_002bf778	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-ABI; mutants 23/23; callers ok (9 sites); branches 0/0
-Pool_Init_003653b0	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-20: PASS-ABI; mutants 34/34; callers ok (10 sites); branches 6/6
+Pool_Init_003653b0	C	shipped	PASS-ABI	1.000	11	gate.py 2026-11-23: PASS-ABI; mutants 34/34; callers ok (10 sites); branches 6/6
 Buffer_InitEmpty_002ae960	C	shipped	PASS-ABI	1.000	12	gate.py 2026-11-22: PASS-ABI; mutants 13/13; callers ok (10 sites); branches 0/0
 Byte0_SetS8_002cc2d0	C	shipped	PASS-ABI	1.000	12	gate.py 2026-11-22: PASS-ABI; mutants 5/5; callers ok (12 sites); branches 0/0
 Byte1_SetS8_002cc2e0	C	shipped	PASS-ABI	1.000	12	gate.py 2026-11-22: PASS-ABI; mutants 5/5; callers ok (11 sites); branches 0/0
@@ -504,7 +504,7 @@ Map10_FindValue14_00368390	C	gated	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-AB
 Object84_Reset_0031e2a0	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 55/55; callers ok (2 sites); branches 0/0
 Object_ClearVectors_00371330	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 26/26; callers ok (2 sites); branches 8/8
 Object_Init3E3F50_002ad088	C	gated	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 31/31; callers ok (2 sites); branches 0/0
-Pool38_AllocNode_002b70e8	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-22: PASS-ABI; mutants 80/80; callers ok (2 sites); branches 8/8
+Pool38_AllocNode_002b70e8	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-23: PASS-ABI; mutants 80/80; callers ok (2 sites); branches 8/8
 Pow2_ToBlockCode_00344fd0	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-22: PASS-ABI; mutants 27/27; callers ok (2 sites); branches 12/12
 RbTreeNil3A8A58_Rotate_left_002aeef8	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 43/43; callers ok (5 sites); branches 10/10
 RbTreeNil3A8A58_Rotate_right_002aef60	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 43/43; callers ok (5 sites); branches 10/10
@@ -518,7 +518,7 @@ StaticInit_3F9930_3F9BE8_0012b188	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21
 Str_ToUpperAt_002aea28	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 10/10; callers ok (2 sites); branches 4/4
 Table3A8D38_FindKey_003694b0	C	gated	PASS-ABI	1.000	17	gate.py 2026-11-21: PASS-ABI; mutants 23/23; callers ok (3 sites); branches 6/6
 Table431A08_Remove_002259b0	C	shipped	PASS-ABI	1.000	17	gate.py 2026-11-22: PASS-ABI; mutants 23/23; callers ok (2 sites); branches 12/12
-VectorInt24_EraseValue_002d1f68	C	gated	PASS-ABI	1.000	17	gate.py 2026-11-22: PASS-ABI; mutants 31/31; callers ok (2 sites); branches 12/12
+VectorInt24_EraseValue_002d1f68	C	gated	PASS-ABI	1.000	17	gate.py 2026-11-23: PASS-ABI; mutants 31/31; callers ok (2 sites); branches 12/12
 Field354_OrBits_00169b48	C	gated	PASS-ABI	1.000	18	gate.py 2026-11-21: PASS-ABI; mutants 6/6; callers ok (4 sites); branches 0/0
 Field10_From34_001914d0	C	gated	PASS-ABI	1.000	18	gate.py 2026-11-21: PASS-ABI; mutants 7/7; callers ok (1 sites); branches 0/0
 Field18C_Exchange_001b41a0	C	gated	PASS-ABI	1.000	18	gate.py 2026-11-21: PASS-ABI; mutants 6/6; callers ok (2 sites); branches 0/0
@@ -613,7 +613,7 @@ Object1C_InitFirst_0035d190	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS
 Byte_OrFrom_00375aa8	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-22: PASS-ABI; mutants 6/6; callers ok (8 sites); branches 0/0
 Globals3F8914_Set_00102848	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 17/17; callers ok (1 sites); branches 0/0
 Field10_TryDecrement_001f33a8	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 10/10; callers ok (1 sites); branches 2/2
-Rgba_ClampAlpha80_002a97d0	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-22: PASS-ABI; mutants 12/12; callers ok (3 sites); branches 6/6
+Rgba_ClampAlpha80_002a97d0	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-23: PASS-ABI; mutants 12/12; callers ok (3 sites); branches 6/6
 ReturnArg1_002c0ce8	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 1/1; callers ok (1 sites); branches 0/0
 Half_SetFlag8000_003476a0	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 4/4
 Pool3F7D78_Free_00172cc0	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 20/20; callers ok (1 sites); branches 6/6
@@ -627,7 +627,7 @@ List3F8538_Remove_00339fe8	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-22: PASS-AB
 Record14_Set_00370490	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 0/0
 List_ClearObjBC_001498b8	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-22: PASS-ABI; mutants 11/11; callers ok (1 sites); branches 4/4
 List_MarkObjKey8_0015e620	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-22: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 6/6
-Halves_ZeroCounted_0031de38	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 4/4
+Halves_ZeroCounted_0031de38	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-23: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 4/4
 Object1C_Init3B28B0_0013f670	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 24/24; callers ok (1 sites); branches 0/0
 Pairs2_InitIdentity_002580d8	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 17/17; callers ok (1 sites); branches 2/2
 Object18_Init3E6088_002c4720	C	gated	PASS-ABI	1.000	20	gate.py 2026-11-21: PASS-ABI; mutants 21/21; callers ok (1 sites); branches 0/0
@@ -635,7 +635,7 @@ Record18_InitFromOwner_002f5c18	C	shipped	PASS-ABI	1.000	20	gate.py 2026-11-21: 
 Rect_SetWords_003363d0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 16/16; callers ok (1 sites); branches 0/0
 Object30_InitKind2_00336a40	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 46/46; callers ok (1 sites); branches 0/0
 List_MarkFirstKey5C_0015e578	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 20/20; callers ok (1 sites); branches 6/6
-Object34_Clear_001f3590	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 33/33; callers ok (1 sites); branches 2/2
+Object34_Clear_001f3590	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-23: PASS-ABI; mutants 33/33; callers ok (1 sites); branches 2/2
 Array20_SetVtable3DC100_0026f1d0	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 8/8; callers ok (2 sites); branches 4/4
 Bytes1C_CopyTo84_0028aed0	C	gated	PASS-STRICT	1.000	21	gate.py 2026-11-21: PASS-STRICT; mutants 18/18; callers ok (1 sites); branches 0/0
 Object1C_Init3D1BD8_0020cc28	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 29/29; callers ok (1 sites); branches 0/0
@@ -644,16 +644,16 @@ Packet_Queue7C_002a3db8	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI
 List8_FindKeyC_002b01d0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 22/22; callers ok (1 sites); branches 6/6
 Vector14_Clear24_0033cdc8	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 12/12; callers ok (1 sites); branches 4/4
 Block_CopyWords24_0015b238	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 19/19; callers ok (1 sites); branches 4/4
-Table4565F0_SetAll_0016fc48	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 4/4
-Object84_InitTimers_001d1dd0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 29/29; callers ok (1 sites); branches 2/2
+Table4565F0_SetAll_0016fc48	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-23: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 4/4
+Object84_InitTimers_001d1dd0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-23: PASS-ABI; mutants 29/29; callers ok (1 sites); branches 2/2
 List_AppendValuesTo12FBC_00279218	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 21/21; callers ok (2 sites); branches 4/4
 Slots114_Claim_00231f90	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 16/16; callers ok (2 sites); branches 4/4
 Stream_ReadBytes_002787f0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 21/21; callers ok (2 sites); branches 4/4
-Selection58_Clear_00351590	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 28/28; callers ok (2 sites); branches 6/6
+Selection58_Clear_00351590	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-23: PASS-ABI; mutants 28/28; callers ok (2 sites); branches 6/6
 Object2C_InitDefaults_0035cff0	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 45/45; callers ok (1 sites); branches 0/0
 List404_Remove_0035e890	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 19/19; callers ok (1 sites); branches 6/6
 Level_SplitBytes49_00112000	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 35/35; callers ok (1 sites); branches 6/6
-Words4_CopyFromTable40B3_001c2090	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 4/4
+Words4_CopyFromTable40B3_001c2090	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-23: PASS-ABI; mutants 14/14; callers ok (1 sites); branches 4/4
 Mt_Seed_00248da0	C	gated	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 18/18; callers ok (1 sites); branches 2/2
 Table4565F0_Reset_00315858	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-22: PASS-ABI; mutants 21/21; callers ok (1 sites); branches 6/6
 State_CommitFrom1C_00191480	C	shipped	PASS-ABI	1.000	21	gate.py 2026-11-21: PASS-ABI; mutants 37/37; callers ok (1 sites); branches 0/0
@@ -670,15 +670,16 @@ Slots64_ReleaseToPool_00365790	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: P
 Object20_Clear_0026b0d8	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-21: PASS-ABI; mutants 23/23; callers ok (1 sites); branches 0/0
 Info_GetSixFields_002a5210	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 44/44; callers ok (1 sites); branches 2/2
 Object9C_InitTable_003479a8	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 31/31; callers ok (1 sites); branches 2/2
-Slots_ResetAll_00231898	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 24/24; callers ok (1 sites); branches 4/4
-List12FBC_ClearFlag4000_00279610	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 4/4
+Slots_ResetAll_00231898	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-23: PASS-ABI; mutants 24/24; callers ok (1 sites); branches 4/4
+List12FBC_ClearFlag4000_00279610	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-23: PASS-ABI; mutants 13/13; callers ok (1 sites); branches 4/4
 Records1C_Copy_0027e1b8	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 25/25; callers ok (1 sites); branches 4/4
 Object20_ClearTwoVec3_002630c8	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-21: PASS-ABI; mutants 23/23; callers ok (2 sites); branches 0/0
 Object28_Init3E5B88_002c2eb8	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 59/59; callers ok (1 sites); branches 0/0
 List_FindKey8Iter_0035cf90	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 15/15; callers ok (1 sites); branches 8/8
-Object48_Init3B7CD0_00167f40	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-21: PASS-ABI; mutants 22/22; callers ok (1 sites); branches 4/4
+Object48_Init3B7CD0_00167f40	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-23: PASS-ABI; mutants 22/22; callers ok (1 sites); branches 4/4
 StaticInit_44AA08_00239d90	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 27/27; callers ok (1 sites); branches 4/4
-Format_FromKind_002949b0	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 37/37; callers ok (2 sites); branches 12/12
+Format_FromKind_002949b0	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-23: PASS-ABI; mutants 37/37; callers ok (2 sites); branches 12/12
 Object20_Init3E5A10_002c2d68	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-21: PASS-ABI; mutants 28/28; callers ok (1 sites); branches 0/0
 Cursor_NextOrLast_00360810	C	shipped	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 30/30; callers ok (1 sites); branches 6/6
 Table_FindHalf6_00347b50	C	gated	PASS-ABI	1.000	22	gate.py 2026-11-22: PASS-ABI; mutants 41/41; callers ok (1 sites); branches 8/8
+Fp_AddParts_00229ae8	B	gate-fail	PASS-ABI	0.881	deferred	gate.py 2026-11-23: PASS-ABI; mutants 118/134; callers ok (2 sites); branches 42/42

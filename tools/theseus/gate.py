@@ -154,6 +154,16 @@ def gate(name, batch):
     return rec
 
 
+def kept_status_failures(recs):
+    """Names of failed rewrites whose ledger row is shipped/reviewed/rejected (status not changed)."""
+    if not os.path.exists(LEDGER):
+        return []
+    with open(LEDGER) as f:
+        status = {r["name"]: r["status"] for r in csv.DictReader(f, delimiter="\t")}
+    return [f"{r['name']} ({status[r['name']]})" for r in recs
+            if not r["passed"] and status.get(r["name"]) in KEEP_STATUS]
+
+
 def update_ledger(recs):
     rows = []
     if os.path.exists(LEDGER):
@@ -197,8 +207,12 @@ def main():
               + "".join(f"\n        survivor {s}" for s in r["survivors"])
               + "".join(f"\n        not compiling {s}" for s in r["not_compiling"]))
     if not a.no_ledger:
+        kept = kept_status_failures(recs)
         update_ledger(recs)
         print(f"ledger: {os.path.relpath(LEDGER, REPO)}")
+        if kept:
+            # These rows keep their status (KEEP_STATUS), so the ledger alone would hide the failure.
+            print(f"WARNING: {len(kept)} rows FAILED but keep their status: " + ", ".join(kept))
     sys.exit(0 if all(r["passed"] for r in recs) else 1)
 
 
