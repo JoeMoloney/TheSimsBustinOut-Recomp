@@ -1,18 +1,19 @@
 # Sims Bustin' Out Recomp — Handoff
 
-Last updated: 2026-11-23. **Keep this file short** (target ~10 KB): current state, next steps, reference.
+Last updated: 2026-11-25. **Keep this file short** (target ~10 KB): current state, next steps, reference.
 Session history goes to `docs/devlog/` (one file per date range; the full pre-Nov-23 handoff is archived there verbatim).
 
 ## Current state
 
 - **Boots and plays** into Create-A-Sim and the house (static recompilation with PS2Recomp, HLE for pad/mc/mpeg). Slow (~5-8x below real time; the software GS renderer is ~72% of the game thread).
-- **3D FIXED (Nov 23):** after the FPU fixes (rebuild + scripted run, `work/frames-fpu/sheet.png`), Create-A-Sim draws correctly (room, Sim, parrot, window). Before: camera-inside-geometry wedges and a flat yellow sky. Most likely cause: **`sqrt.s` read fs instead of ft** (every sqrt computed sqrt(f0); 65 functions, incl. the CAS camera/float code `FUN_002b5708`); not bisected against the other four FPU fixes. The house is not checked yet.
+- **3D FIXED (Nov 23):** after the FPU fixes (rebuild + scripted run, `work/frames-fpu/sheet.png`), Create-A-Sim draws correctly (room, Sim, parrot, window). Before: camera-inside-geometry wedges and a flat yellow sky. Most likely cause: **`sqrt.s` read fs instead of ft** (every sqrt computed sqrt(f0); 65 functions, incl. the CAS camera/float code `FUN_002b5708`); not bisected against the other four FPU fixes. **Nov 25: confirmed in the game world** (visible session: CAS and the club/house render normally, `work/frames-house2/sheet.png`; log has only the 6 known IOP warnings).
 - **Theseus** (hand rewrites diff-tested against the originals): ledger 683 rows, **470 shipped, 213 gated**; 41 tier-B left, 3 deferred, 3 busy-wait loops never to rewrite. **Paused** until the 3D bug is found.
 - **PS2Recomp** (`references/PS2Recomp`, branch `sims-bustin-out-fixes`): local fixes for sign-test branches (64-bit), CVT.W.S, the Nov 23 FPU fixes (sqrt operand, compares, max/min, ...), movz/movn, texture cache, scripted pad, sceMpegIsEnd, FindAddress, etc. `ps2x_tests` 460/460.
 
 ## Next steps (agreed Nov 23: get to a clean baseline, then rethink the approach)
 
-1. Check the house/live mode visually (user's visible session), then `regate_changed.py --old-suffix .before-fpu` for shipped rewrites whose original changed; resume Theseus (it was paused only until the 3D bug was found).
+1. Re-gate after the FPU regeneration (~20 min): `gate.py $(cat work/regate-fpu.names) -j 12 --batch regate-fpu`. The list is the **55 rewrites (43 shipped)** whose generated original changed; `--runtime-rev d6115ae~1` would list all 684 because `ps2_runtime_macros.h` changed, but those header changes are FPU-only (add/sub/mul, compares, max/min, div flags) and no ledger original uses an FPU macro, so they can't affect the others. Then resume Theseus (it was paused only until the 3D bug was found).
+   - Small runtime fix to make: raylib's default exit key is Escape, so a Steam Controller in desktop mode (Start = Esc) closes the game; add `SetExitKey(KEY_NULL)` after `InitWindow` in `ps2_runtime.cpp` (~3 min rebuild).
 2. `_fpadd_parts` (0x229ae8): gated PASS-ABI but 16 mutant survivors (rules gaps; `work/theseus-runs/deferred/gate-s64.log`). Fix rules, `ship.py`.
 3. Exact PS2 rounding: run `unicorn_check.py --all-fpu --tag fpu-exact` (no `UNICORN_FPU`) to measure how often truncation vs round-to-nearest changes results; consider it for the runtime (in `FUN_002be238`, 7,718 CAS calls, 1,563/1,992 cases differ in the last bit).
 4. **Agreed Nov 23 (user priorities: a readable reference + accuracy "exactly as originally designed"):** (a) class map from vtables (done: `tools/classes/vtables.py`, 464 classes), (b) **Unicorn as an independent reference** (done, incl. the PS2 FPU), (c) then rewrites class by class with real types. Details: `docs/devlog/2026-11-23-unicorn-fpu.md`.
@@ -68,7 +69,7 @@ python3 tools/theseus/regate_changed.py --old-suffix .before-X [--runtime-rev <o
 ## Known facts worth keeping in mind
 
 - Ruled out for the 3D bug: packed XYZ2/XYZF2 ADC bit, fog, FPU overflow (the runtime clamps like the PS2: `ps2_fadd` etc.), CVT.W.S, 32-bit sign branches, VU1 constant stores. VU1 FTOI truncates/saturates; VU1 runs with FE_TOWARDZERO. **Not done:** the EE FPU still rounds to nearest on the host (the PS2 truncates; bit-exact reference in `tools/theseus/harness/ps2_fpu_ref.h`). VU vector ops (`ps2_vfinish`) still check only the result for denormals, as the scalar ops did before Nov 23 (VU1 is in the 3D path).
-- The scooter intro (a movie) shows a flat grey-white ground: either how the movie looks or an MPEG decode/colour issue in our sceMpeg HLE; compare with PCSX2 sometime (not a 3D-pipeline question).
+- The scooter intro (a movie) shows a flat grey-white ground: that is how the movie looks (white backdrop; the user knows the original), not an MPEG bug.
 - Regeneration drops the 13 hand-traced debug files (intended); register_functions.cpp is compiled at -O0.
 - Function map: recovered via Ghidra MCP (9,024 functions; some ends approximated) + supplemental map (11,192 in all).
 
