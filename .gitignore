@@ -23,3 +23,5 @@ __pycache__/
 
 # Memory-card saves and other runtime data (local only for now)
 /runtime-data/
+/inputs/*.7z
+/inputs/*.7z
